@@ -40,6 +40,10 @@ func NewField(value UInt64) Field {
 	return Field{value.reduceOnce().reduceOnceAssert()}
 }
 
+func (self Field) Neg() Field {
+	return Field{(P - self.fp).reduceOnce().reduceOnceAssert()}
+}
+
 func (self Field) Add(op2 Field) Field {
 	return Field{(self.fp + op2.fp).reduceOnce().reduceOnceAssert()}
 }
