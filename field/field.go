@@ -32,22 +32,27 @@ func asLimbs(x UInt64) (uint32, uint32) {
 	return uint32(x >> 32), uint32(x)
 }
 
+// NewField reduces initial value in the field
 func NewField(value UInt64) Field {
 	return Field{value.reduceOnce().reduceOnceAssert()}
 }
 
+// Neg negates number in the field
 func (self Field) Neg() Field {
 	return Field{(P - self.fp).reduceOnce().reduceOnceAssert()}
 }
 
+// Add adds two field elements and reduces the resulting number in the field
 func (self Field) Add(op2 Field) Field {
 	return Field{(self.fp + op2.fp).reduceOnce().reduceOnceAssert()}
 }
 
+// AddAssign works same as Add, assigns final value to self
 func (self *Field) AddAssign(op2 Field) {
 	*self = self.Add(op2)
 }
 
+// Sub subtracts two field elements and reduces the resulting number in the field
 func (self Field) Sub(op2 Field) Field {
 	if op2.fp > self.fp {
 		return Field{(P - op2.fp + self.fp).reduceOnce().reduceOnceAssert()}
@@ -55,6 +60,7 @@ func (self Field) Sub(op2 Field) Field {
 	return Field{(self.fp - op2.fp).reduceOnce().reduceOnceAssert()}
 }
 
+// SubAssign works same as Sub, assigns final value to self
 func (self *Field) SubAssign(op2 Field) {
 	*self = self.Sub(op2)
 }
