@@ -32,11 +32,7 @@ func asLimbs(x UInt64) (uint32, uint32) {
 	return uint32(x >> 32), uint32(x)
 }
 
-// WORKS AS from_127() and from_128()
 func NewField(value UInt64) Field {
-	// if value > P {
-	// 	value = value & P;
-	// }
 	return Field{value.reduceOnce().reduceOnceAssert()}
 }
 
