@@ -47,3 +47,14 @@ func (self Field) Add(op2 Field) Field {
 func (self *Field) AddAssign(op2 Field) {
 	*self = self.Add(op2)
 }
+
+func (self Field) Sub(op2 Field) Field {
+	if op2.fp > self.fp {
+		return Field{(P - op2.fp + self.fp).reduceOnce().reduceOnceAssert()}
+	}
+	return Field{(self.fp - op2.fp).reduceOnce().reduceOnceAssert()}
+}
+
+func (self *Field) SubAssign(op2 Field) {
+	*self = self.Sub(op2)
+}
