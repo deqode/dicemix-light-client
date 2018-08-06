@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package commons;
+
+// for obtaining Status Code from response messages from server
+// to parse response into suitable object
+message GenericResponse {
+  uint32 Code = 1;
+}
+
+message GenericRequest {
+  uint32 Code = 1;
+}
+
+// S_JOIN_RESPONSE = 100
+message RegisterResponse {
+  uint32 Code = 1;
+  sint32 Id = 2;
+  string Timestamp = 3;
+  string Message = 4;
+  string Err = 5;
+}
+
+message DiceMixResponse {
+  uint32 Code = 1;
+  repeated PeersInfo Peers = 2;
+  string Timestamp = 3;
+  string Message = 4;
+  string Err = 5;
+}
+
+message PeersInfo {
+  int32 Id = 1;
+  bytes PublicKey = 2;
+  uint32 NumMsgs = 3;
+  repeated uint64 DCVector = 4;
+  repeated bytes DCSimpleVector = 5;
+}
+
+// C_KEY_EXCHANGE = 2
+message KeyExchangeRequest {
+  uint32 Code = 1;
+  sint32 Id = 2;
+  bytes PublicKey = 3;
+  uint32 NumMsgs = 4;
+  string Timestamp = 5;
+}
+
+// C_EXP_DC_VECTOR = 3
+message DCExpRequest {
+  uint32 Code = 1;
+  sint32 Id = 2;
+  repeated uint64 DCExpVector = 3;
+  string Timestamp = 4;
+}
+
+// S_EXP_DC_VECTOR = 103
+message DCExpResponse {
+  uint32 Code = 1;
+  repeated uint64 Roots = 2;
+  string Timestamp = 3;
+  string Message = 4;
+  string Err = 5;
+}
+
+// C_SIMPLE_DC_VECTOR = 4
+message DCSimpleRequest {
+  uint32 Code = 1;
+  sint32 Id = 2;
+  repeated bytes DCSimpleVector = 3;
+  string Timestamp = 4;
+}
