@@ -25,17 +25,17 @@ var subtractionTests = []testpair{
 	{[]UInt64{P, 5}, P - 5},
 }
 
+var multiplicationTests = []testpair{
+	{[]UInt64{4, 3}, 12},
+	{[]UInt64{2239513929391938494, 1021644029483981869}, 619009326837417152},
+	{[]UInt64{2305843009213693950, 5}, 2305843009213693946},
+}
+
 var negationTests = []testpair{
 	{[]UInt64{4}, P - 4},
 	{[]UInt64{P}, 0},
 	{[]UInt64{P - 1}, 1},
 	{[]UInt64{P + 5}, P - 5},
-}
-
-var multiplicationTests = []testpair{
-	{[]UInt64{4, 3}, 12},
-	{[]UInt64{2239513929391938494, 1021644029483981869}, 619009326837417152},
-	{[]UInt64{2305843009213693950, 5}, 2305843009213693946},
 }
 
 func TestAddition(t *testing.T) {

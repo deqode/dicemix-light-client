@@ -1,0 +1,25 @@
+LINKS --
+  HD WALLET
+    https://godoc.org/github.com/wemeetagain/go-hdwallet
+
+Peers
+
+Peer1 --
+  id = 
+  my_kesk = 
+  my_kepk = 
+  my_num_msgs = 
+  my_msgs = [
+
+  ]
+---------------------------------------- links --------------------------------------
+FLAGS
+  https://gobyexample.com/command-line-flags
+---------------------------------------- check error ---------------------------------
+
+func checkError(err error){
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Fatal error: %s", err.Error())
+        os.Exit(1)
+    }
+}

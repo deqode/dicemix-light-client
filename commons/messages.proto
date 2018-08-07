@@ -70,3 +70,11 @@ message DCSimpleRequest {
   repeated bytes DCSimpleVector = 3;
   string Timestamp = 4;
 }
+
+
+// C_SIMPLE_DC_VECTOR = 4
+message TestRequest {
+  uint32 Code = 1;
+  sint32 Id = 2;
+  repeated uint64 DCExpVector = 3;
+}

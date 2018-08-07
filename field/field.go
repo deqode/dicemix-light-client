@@ -16,7 +16,7 @@ const P UInt64 = (1 << 61) - 1
 
 // Field -- It is consistent iff 0 <= src.0 <= P.
 type Field struct {
-	fp UInt64
+	Fp UInt64
 }
 
 func (src UInt64) reduceOnce() UInt64 {
@@ -55,12 +55,12 @@ func NewField(value UInt64) Field {
 
 // Neg negates number in the field
 func (src Field) Neg() Field {
-	return Field{(P - src.fp).reduceOnce().reduceOnceAssert()}
+	return Field{(P - src.Fp).reduceOnce().reduceOnceAssert()}
 }
 
 // Add adds two field elements and reduces the resulting number in the field
 func (src Field) Add(op2 Field) Field {
-	return Field{(src.fp + op2.fp).reduceOnce().reduceOnceAssert()}
+	return Field{(src.Fp + op2.Fp).reduceOnce().reduceOnceAssert()}
 }
 
 // AddAssign works same as Add, assigns final value to src
@@ -70,10 +70,10 @@ func (src *Field) AddAssign(op2 Field) {
 
 // Sub subtracts two field elements and reduces the resulting number in the field
 func (src Field) Sub(op2 Field) Field {
-	if op2.fp > src.fp {
-		return Field{(P - op2.fp + src.fp).reduceOnce().reduceOnceAssert()}
+	if op2.Fp > src.Fp {
+		return Field{(P - op2.Fp + src.Fp).reduceOnce().reduceOnceAssert()}
 	}
-	return Field{(src.fp - op2.fp).reduceOnce().reduceOnceAssert()}
+	return Field{(src.Fp - op2.Fp).reduceOnce().reduceOnceAssert()}
 }
 
 // SubAssign works same as Sub, assigns final value to src
@@ -83,7 +83,7 @@ func (src *Field) SubAssign(op2 Field) {
 
 // Mul muliplies two field elements and reduces the resulting number in the field
 func (src Field) Mul(op2 Field) Field {
-	var high, low uint64 = mathutil.MulUint128_64(uint64(src.fp), uint64(op2.fp))
+	var high, low uint64 = mathutil.MulUint128_64(uint64(src.Fp), uint64(op2.Fp))
 	var rh, rl = UInt64(high), UInt64(low)
 	var res = rh.reduceOnceMul(rl).reduceOnceAssert()
 	return Field{res}
