@@ -5,10 +5,10 @@ import (
 
 	"../field"
 	"../utils"
-	base58 "github.com/jbenet/go-base58"
 	"github.com/shomali11/util/xhashes"
 )
 
+// to expose DC-NET methods
 type dcNet struct {
 	DC
 }
@@ -18,7 +18,7 @@ func NewDCNetwork() DC {
 	return &dcNet{}
 }
 
-// RunDCExponential -Runs DC-EXP
+// RunDCSimple - Runs DC-Simple with slot reservation
 func (d *dcNet) RunDCSimple(state *utils.State) {
 	// initaializing variables
 	slots := make([]int, state.MyMsgCount)
@@ -30,6 +30,7 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 		slots[i] = -1
 	}
 
+	// Run an ordinary DC-net with slot reservations
 	for j = 0; j < state.MyMsgCount; j++ {
 		index, count := -1, 0
 		for i = 0; i < state.TotalMsgsCount; i++ {
@@ -38,6 +39,8 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 			}
 		}
 
+		// if there is exactly one i
+		// with all_msg_hashes[i] = my_msg_hashes[j] then
 		if count == 1 {
 			slots[j] = index
 		} else {
@@ -53,29 +56,34 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 		}
 	}
 
-	//  array of |totalMsgsCount| arrays of slot_size bytes, all initalized with 0
+	// array of |totalMsgsCount| arrays of slot_size bytes, all initalized with 0
 	state.DCSimpleVector = make([][]byte, state.TotalMsgsCount)
 
+	// reserve 20 bytes (160 bits) for each slot
+	// to store messages of ours and peers
 	for j = 0; j < state.TotalMsgsCount; j++ {
 		state.DCSimpleVector[j] = make([]byte, 20)
 	}
 
+	// store our all messages (byte encoded) in slot reserved
 	for j = 0; j < state.MyMsgCount; j++ {
-		fmt.Printf("\nBYTES = %v\n", base58StringToBytes(state.MyMessages[j]))
-		state.DCSimpleVector[slots[j]] = base58StringToBytes(state.MyMessages[j])
+		state.DCSimpleVector[slots[j]] = utils.Base58StringToBytes(state.MyMessages[j])
 	}
 
-	fmt.Printf("\nSLOT's = %v\n", state.DCSimpleVector)
+	fmt.Printf("\nSLOT's = %v\n\n", state.DCSimpleVector)
 
 	for i = 0; i < peersCount; i++ {
 		for j = 0; j < state.TotalMsgsCount; j++ {
+			// encode messages in slots
+			// xor operation - dc_simple_vector[j] = dc_simple_vector[j] + <randomness for chacha20>
 			xorBytes(state.DCSimpleVector[j], state.DCSimpleVector[j], state.Peers[i].Dicemix.GetBytes(20))
 		}
 	}
 
-	fmt.Printf("\nMY DC_SIMPLE[] = %v\n", state.DCSimpleVector)
+	fmt.Printf("MY DC SIMPLE VECTOR = %v\n\n", state.DCSimpleVector)
 }
 
+// Resolve the DC-net
 func (d *dcNet) ResolveDCNet(state *utils.State) {
 	var i, j uint32
 	peersCount := uint32(len(state.Peers))
@@ -83,6 +91,8 @@ func (d *dcNet) ResolveDCNet(state *utils.State) {
 
 	for i = 0; i < peersCount; i++ {
 		for j = 0; j < state.TotalMsgsCount; j++ {
+			// decodes messages from slots by cancelling out randomness introduced in DC-Simple
+			// xor operation - all_messages[j] = dc_simple_vector[j] + <randomness for chacha20>
 			xorBytes(state.AllMessages[j], state.AllMessages[j], state.Peers[i].DCSimpleVector[j])
 		}
 	}
@@ -90,15 +100,23 @@ func (d *dcNet) ResolveDCNet(state *utils.State) {
 	fmt.Printf("\nMY RESOLVED DC NET VECTOR[] = %v\n", state.AllMessages)
 }
 
+// Run a DC-net with exponential encoding
 // generates my_dc[]
 func (d *dcNet) DeriveMyDCVector(state *utils.State) {
 	peersCount := uint32(len(state.Peers))
-	state.TotalMsgsCount = peersCount + state.MyMsgCount
+	state.TotalMsgsCount = state.MyMsgCount
+
+	for _, peer := range state.Peers {
+		state.TotalMsgsCount += peer.NumMsgs
+	}
 
 	state.MyDC = make([]uint64, state.TotalMsgsCount)
 	var i, j uint32
 
+	// generates power sums of message_hashes
+	// my_dc[i] := my_dc[i] (+) (my_msg_hashes[j] ** (i + 1))
 	for j = 0; j < state.MyMsgCount; j++ {
+		// generates 64 bit hash of my_message[j]
 		state.MyMessagesHash[j] = shortHash(state.MyMessages[j])
 		var pow uint64 = 1
 		for i = 0; i < state.TotalMsgsCount; i++ {
@@ -110,6 +128,8 @@ func (d *dcNet) DeriveMyDCVector(state *utils.State) {
 		}
 	}
 
+	// encode power sums
+	// my_dc[i] := my_dc[i] (+) (sgn(my_id - p.id) (*) p.dicemix.get_field_element())
 	for j = 0; j < peersCount; j++ {
 		for i = 0; i < state.TotalMsgsCount; i++ {
 			var op1 = field.NewField(field.UInt64(state.MyDC[i]))
@@ -135,14 +155,7 @@ func power(value, t uint64) uint64 {
 	return uint64(field.NewField(field.UInt64(value)).Mul(field.NewField(field.UInt64(t))).Fp)
 }
 
+// reduces value into field range
 func reduce(value uint64) uint64 {
 	return uint64(field.NewField(field.UInt64(value)).Fp)
-}
-
-func bytesToBase58String(bytes []byte) string {
-	return base58.Encode(bytes)
-}
-
-func base58StringToBytes(str string) []byte {
-	return base58.Decode(str)
 }
