@@ -7,6 +7,7 @@ const (
 	C_SIMPLE_DC_VECTOR = 4
 	C_TX_SIGNATURE     = 5
 	ERROR              = 6
+	TEST               = 7
 )
 
 const (
