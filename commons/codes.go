@@ -1,15 +1,15 @@
 package commons
 
+// constant Request Codes
 const (
 	C_JOIN_REQUEST     = 1
 	C_KEY_EXCHANGE     = 2
 	C_EXP_DC_VECTOR    = 3
 	C_SIMPLE_DC_VECTOR = 4
 	C_TX_SIGNATURE     = 5
-	ERROR              = 6
-	TEST               = 7
 )
 
+// constant Response Codes
 const (
 	S_JOIN_RESPONSE    = 100
 	S_START_DICEMIX    = 101

@@ -8,11 +8,8 @@ message GenericResponse {
   uint32 Code = 1;
 }
 
-message GenericRequest {
-  uint32 Code = 1;
-}
-
-// S_JOIN_RESPONSE = 100
+// Response returned by server when attempt to join dicemix
+// S_JOIN_RESPONSE
 message RegisterResponse {
   uint32 Code = 1;
   sint32 Id = 2;
@@ -21,6 +18,10 @@ message RegisterResponse {
   string Err = 5;
 }
 
+// Response returned by server for -
+// StartDiceMix - Code S_START_DICEMIX 
+// KeyExchangeResponse - Code S_KEY_EXCHANGE
+// DCSimpleResponse - Code S_SIMPLE_DC_VECTOR
 message DiceMixResponse {
   uint32 Code = 1;
   repeated PeersInfo Peers = 2;
@@ -29,6 +30,7 @@ message DiceMixResponse {
   string Err = 5;
 }
 
+// Sub-message for DiceMixResponse
 message PeersInfo {
   int32 Id = 1;
   bytes PublicKey = 2;
@@ -37,7 +39,9 @@ message PeersInfo {
   repeated bytes DCSimpleVector = 5;
 }
 
-// C_KEY_EXCHANGE = 2
+// For broadcasting our public key
+// to initiate KeyExchange
+// Code - C_KEY_EXCHANGE
 message KeyExchangeRequest {
   uint32 Code = 1;
   sint32 Id = 2;
@@ -46,7 +50,9 @@ message KeyExchangeRequest {
   string Timestamp = 5;
 }
 
-// C_EXP_DC_VECTOR = 3
+// For broadcasting our DC Exponential Vector
+// to initiate DC-EXP
+// Code - C_EXP_DC_VECTOR
 message DCExpRequest {
   uint32 Code = 1;
   sint32 Id = 2;
@@ -54,7 +60,9 @@ message DCExpRequest {
   string Timestamp = 4;
 }
 
-// S_EXP_DC_VECTOR = 103
+// Response against DCExpRequest
+// conatins ROOTS calculated by server using FLINT
+// Code - S_EXP_DC_VECTOR
 message DCExpResponse {
   uint32 Code = 1;
   repeated uint64 Roots = 2;
@@ -63,18 +71,12 @@ message DCExpResponse {
   string Err = 5;
 }
 
-// C_SIMPLE_DC_VECTOR = 4
+// For broadcasting our DC Simple Vector
+// to initiate DC-SIMPLE
+// C_SIMPLE_DC_VECTOR
 message DCSimpleRequest {
   uint32 Code = 1;
   sint32 Id = 2;
   repeated bytes DCSimpleVector = 3;
   string Timestamp = 4;
-}
-
-
-// C_SIMPLE_DC_VECTOR = 4
-message TestRequest {
-  uint32 Code = 1;
-  sint32 Id = 2;
-  repeated uint64 DCExpVector = 3;
 }
