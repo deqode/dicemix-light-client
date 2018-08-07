@@ -16,7 +16,6 @@ type Peers struct {
 	NumMsgs        uint32
 	SharedKey      []byte
 	Dicemix        rng.DiceMixRng
-	DC             []uint64
 	DCSimpleVector [][]byte
 }
 
@@ -36,13 +35,12 @@ type State struct {
 	MyMessages     []string
 	MyMessagesHash []uint64
 	MyMsgCount     uint32
-	DCCombined     []uint64
 	DCSimpleVector [][]byte
 	AllMessages    [][]byte
 }
 
 // GenerateMessage - generates a random 20 byte string (160 bits)
-// (Base58 format)
+// returns string encoded with Base58 format
 func GenerateMessage() string {
 	rand.Seed(time.Now().UnixNano())
 	token := make([]byte, 20)

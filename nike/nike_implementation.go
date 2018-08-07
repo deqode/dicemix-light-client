@@ -1,7 +1,6 @@
 package nike
 
 import (
-	"fmt"
 	"log"
 	"sync"
 
@@ -34,9 +33,6 @@ func (n *nike) GenerateKeys(state *utils.State) {
 	if err != nil {
 		log.Fatalf("Error: generating NIKE key pair %v", err)
 	}
-
-	fmt.Printf("MY KESK - %v\n\n", (*state).Kesk)
-	fmt.Printf("MY KEPK - %v\n\n", (*state).Kepk)
 }
 
 // DeriveSharedKeys - derives shared keys for all peers
@@ -61,14 +57,4 @@ func (n *nike) DeriveSharedKeys(state *utils.State) {
 
 		(*state).Peers[i].Dicemix = rng.NewRng((*state).Peers[i].SharedKey)
 	}
-
-	fmt.Printf("\n--------------------------------------\n")
-
-	for _, peer := range state.Peers {
-		fmt.Printf("ID - %v\n", peer.ID)
-		fmt.Printf("PK - %v\n", peer.PubKey)
-		fmt.Printf("Shared Key - %v\n\n", peer.SharedKey)
-	}
-
-	fmt.Printf("\n--------------------------------------\n")
 }
