@@ -8,6 +8,13 @@ message GenericResponse {
   uint32 Code = 1;
 }
 
+// used by server for obtaining Status Code 
+// from request messages sent from client
+// to parse response into suitable object
+message GenericRequest {
+  uint32 Code = 1;
+}
+
 // Response returned by server when attempt to join dicemix
 // S_JOIN_RESPONSE
 message RegisterResponse {
