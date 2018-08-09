@@ -1,6 +1,9 @@
 package main
 
 import (
+	"math/rand"
+	"time"
+
 	"./server"
 	"./utils"
 )
@@ -20,15 +23,23 @@ func initialize() utils.State {
 
 	state.Run = -1
 
-	// NOTE: for sake of simplicity assuming user would have only 1 message to send
-	// although this project can handle multi message clients also
-	state.MyMsgCount = 1
+	// NOTE: for sake of simplicity assuming user would generate random n messages
+	// 0 < n < 4
+	state.MyMsgCount = count()
 	state.MyMessages = make([]string, state.MyMsgCount)
 	state.MyMessagesHash = make([]uint64, state.MyMsgCount)
 
 	// generate random 160 bit message
-	// NOTE: assuming that all peers would have only one message
-	state.MyMessages[0] = utils.GenerateMessage()
+	for i := 0; i < int(state.MyMsgCount); i++ {
+		state.MyMessages[i] = utils.GenerateMessage()
+	}
 
 	return state
+}
+
+// return randomly generated n
+// 0 < n < 4
+func count() uint32 {
+	rand.Seed(time.Now().UnixNano())
+	return uint32(rand.Intn(3-1) + 1)
 }
