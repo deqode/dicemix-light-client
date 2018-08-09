@@ -17,6 +17,7 @@ type Peers struct {
 	SharedKey      []byte
 	Dicemix        rng.DiceMixRng
 	DCSimpleVector [][]byte
+	Ok             bool
 }
 
 // State - stores state info for current run
@@ -28,6 +29,7 @@ type State struct {
 	AllMsgHashes   []uint64
 	MyID           int32
 	MyDC           []uint64
+	MyOk           bool
 	Kesk           crypto.PrivateKey
 	NextKesk       crypto.PrivateKey
 	Kepk           crypto.PublicKey

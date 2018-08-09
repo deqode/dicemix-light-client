@@ -23,8 +23,13 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 	// initaializing variables
 	slots := make([]int, state.MyMsgCount)
 	peersCount := uint32(len(state.Peers))
-	myOK := true
+	state.MyOk = true
 	var i, j uint32
+	totalMsgsCount := state.MyMsgCount
+
+	for _, peer := range state.Peers {
+		totalMsgsCount += peer.NumMsgs
+	}
 
 	for i := range slots {
 		slots[i] = -1
@@ -33,7 +38,7 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 	// Run an ordinary DC-net with slot reservations
 	for j = 0; j < state.MyMsgCount; j++ {
 		index, count := -1, 0
-		for i = 0; i < state.TotalMsgsCount; i++ {
+		for i = 0; i < totalMsgsCount; i++ {
 			if state.AllMsgHashes[i] == reduce(state.MyMessagesHash[j]) {
 				index, count = int(i), int(count+1)
 			}
@@ -44,11 +49,11 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 		if count == 1 {
 			slots[j] = index
 		} else {
-			myOK = false
+			state.MyOk = false
 		}
 	}
 
-	if !myOK {
+	if !state.MyOk {
 		// Even though the run will be aborted (because we send my_ok = false), transmit the
 		// message in a deterministic slot. This enables the peers to recompute our commitment.
 		for i = 0; i < state.MyMsgCount; i++ {
@@ -57,11 +62,11 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 	}
 
 	// array of |totalMsgsCount| arrays of slot_size bytes, all initalized with 0
-	state.DCSimpleVector = make([][]byte, state.TotalMsgsCount)
+	state.DCSimpleVector = make([][]byte, totalMsgsCount)
 
 	// reserve 20 bytes (160 bits) for each slot
 	// to store messages of ours and peers
-	for j = 0; j < state.TotalMsgsCount; j++ {
+	for j = 0; j < totalMsgsCount; j++ {
 		state.DCSimpleVector[j] = make([]byte, 20)
 	}
 
@@ -73,7 +78,7 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 	fmt.Printf("\nSLOT's = %v\n\n", state.DCSimpleVector)
 
 	for i = 0; i < peersCount; i++ {
-		for j = 0; j < state.TotalMsgsCount; j++ {
+		for j = 0; j < totalMsgsCount; j++ {
 			// encode messages in slots
 			// xor operation - dc_simple_vector[j] = dc_simple_vector[j] + <randomness for chacha20>
 			xorBytes(state.DCSimpleVector[j], state.DCSimpleVector[j], state.Peers[i].Dicemix.GetBytes(20))
@@ -87,10 +92,15 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 func (d *dcNet) ResolveDCNet(state *utils.State) {
 	var i, j uint32
 	peersCount := uint32(len(state.Peers))
+	totalMsgsCount := state.MyMsgCount
+
+	for _, peer := range state.Peers {
+		totalMsgsCount += peer.NumMsgs
+	}
 	state.AllMessages = state.DCSimpleVector
 
 	for i = 0; i < peersCount; i++ {
-		for j = 0; j < state.TotalMsgsCount; j++ {
+		for j = 0; j < totalMsgsCount; j++ {
 			// decodes messages from slots by cancelling out randomness introduced in DC-Simple
 			// xor operation - all_messages[j] = dc_simple_vector[j] + <randomness for chacha20>
 			xorBytes(state.AllMessages[j], state.AllMessages[j], state.Peers[i].DCSimpleVector[j])
@@ -104,13 +114,13 @@ func (d *dcNet) ResolveDCNet(state *utils.State) {
 // generates my_dc[]
 func (d *dcNet) DeriveMyDCVector(state *utils.State) {
 	peersCount := uint32(len(state.Peers))
-	state.TotalMsgsCount = state.MyMsgCount
+	totalMsgsCount := state.MyMsgCount
 
 	for _, peer := range state.Peers {
-		state.TotalMsgsCount += peer.NumMsgs
+		totalMsgsCount += peer.NumMsgs
 	}
 
-	state.MyDC = make([]uint64, state.TotalMsgsCount)
+	state.MyDC = make([]uint64, totalMsgsCount)
 	var i, j uint32
 
 	// generates power sums of message_hashes
@@ -119,7 +129,7 @@ func (d *dcNet) DeriveMyDCVector(state *utils.State) {
 		// generates 64 bit hash of my_message[j]
 		state.MyMessagesHash[j] = shortHash(state.MyMessages[j])
 		var pow uint64 = 1
-		for i = 0; i < state.TotalMsgsCount; i++ {
+		for i = 0; i < totalMsgsCount; i++ {
 			var op1 = field.NewField(field.UInt64(state.MyDC[i]))
 			pow = power(uint64(state.MyMessagesHash[j]), pow)
 			var op2 = field.NewField(field.UInt64(pow))
@@ -131,7 +141,7 @@ func (d *dcNet) DeriveMyDCVector(state *utils.State) {
 	// encode power sums
 	// my_dc[i] := my_dc[i] (+) (sgn(my_id - p.id) (*) p.dicemix.get_field_element())
 	for j = 0; j < peersCount; j++ {
-		for i = 0; i < state.TotalMsgsCount; i++ {
+		for i = 0; i < totalMsgsCount; i++ {
 			var op1 = field.NewField(field.UInt64(state.MyDC[i]))
 			var op2 = field.NewField(field.UInt64(state.Peers[j].Dicemix.GetFieldElement()))
 			if state.MyID < state.Peers[j].ID {

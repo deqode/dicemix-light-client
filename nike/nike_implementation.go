@@ -23,8 +23,6 @@ func NewNike() NIKE {
 // broadcasts self public-key
 // receive other peers public-keys[]
 func (n *nike) GenerateKeys(state *utils.State) {
-	n.Lock()
-	defer n.Unlock()
 	// generate random key pair
 	ecdh := ecdh.NewCurve25519ECDH()
 	var err error
@@ -38,9 +36,6 @@ func (n *nike) GenerateKeys(state *utils.State) {
 // DeriveSharedKeys - derives shared keys for all peers
 // generates RNG based on shared key using ChaCha20
 func (n *nike) DeriveSharedKeys(state *utils.State) {
-	n.Lock()
-	defer n.Unlock()
-
 	ecdh := ecdh.NewCurve25519ECDH()
 	peersCount := len((*state).Peers)
 	for i := 0; i < peersCount; i++ {

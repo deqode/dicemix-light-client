@@ -171,6 +171,7 @@ func handleDCExpResponse(conn *websocket.Conn, response *commons.DCExpResponse, 
 		Code:           commons.C_SIMPLE_DC_VECTOR,
 		Id:             state.MyID,
 		DCSimpleVector: state.DCSimpleVector,
+		MyOk:           state.MyOk,
 		Timestamp:      timestamp(),
 	})
 
@@ -190,8 +191,9 @@ func handleDCSimpleResponse(conn *websocket.Conn, response *commons.DiceMixRespo
 		for j := 0; j < len(state.Peers); j++ {
 			if response.Peers[i].Id == state.Peers[j].ID {
 				state.Peers[j].DCSimpleVector = response.Peers[i].DCSimpleVector
+				state.Peers[j].Ok = response.Peers[i].OK
 
-				fmt.Printf("RECV: Peer %v DC-SIMPLE - %v\n", state.Peers[j].ID, state.Peers[j].DCSimpleVector)
+				fmt.Printf("RECV: Peer %v OK - %v\nDC-SIMPLE - %v\n", state.Peers[j].ID, state.Peers[j].Ok, state.Peers[j].DCSimpleVector)
 				break
 			}
 		}

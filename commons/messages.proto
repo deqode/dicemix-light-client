@@ -44,6 +44,7 @@ message PeersInfo {
   uint32 NumMsgs = 3;
   repeated uint64 DCVector = 4;
   repeated bytes DCSimpleVector = 5;
+  bool OK = 6;
 }
 
 // For broadcasting our public key
@@ -85,5 +86,6 @@ message DCSimpleRequest {
   uint32 Code = 1;
   sint32 Id = 2;
   repeated bytes DCSimpleVector = 3;
-  string Timestamp = 4;
+  bool MyOk = 4;
+  string Timestamp = 5;
 }

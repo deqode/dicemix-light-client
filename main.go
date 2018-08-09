@@ -6,6 +6,8 @@ import (
 )
 
 func main() {
+	// TODO: generate LTSK, LTPK
+
 	// initializes state info
 	var state = initialize()
 
