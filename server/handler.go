@@ -202,6 +202,11 @@ func handleDCSimpleResponse(conn *websocket.Conn, response *commons.DiceMixRespo
 	// finally resolves DC Net Vectors to obtain messages
 	// should contain all honest peers messages in absence of malicious peers
 	iDcNet.ResolveDCNet(state)
+
+	// Verify that every peer agrees to proceed
+	ok := iDcNet.VerifyProceed(state)
+
+	fmt.Printf("\nAgree to Proceed? = %v\n", ok)
 }
 
 // send request to server

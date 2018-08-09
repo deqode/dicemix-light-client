@@ -154,6 +154,34 @@ func (d *dcNet) DeriveMyDCVector(state *utils.State) {
 	fmt.Printf("\nMY DC_VECTOR[] = %v\n", state.MyDC)
 }
 
+// Verify that every peer agrees to proceed
+func (d *dcNet) VerifyProceed(state *utils.State) bool {
+	var i uint32
+	totalMsgsCount := state.MyMsgCount
+
+	// if slot collision occured with one of my messages
+	if !state.MyOk {
+		return false
+	}
+
+	// if slot collision occured with one of my peers messages
+	for _, peer := range state.Peers {
+		totalMsgsCount += peer.NumMsgs
+		if !peer.Ok {
+			return false
+		}
+	}
+
+	// if one of my peer provided wrong confirmation
+	for i = 0; i < totalMsgsCount; i++ {
+		s := shortHash(utils.BytesToBase58String(state.AllMessages[i]))
+		if state.AllMsgHashes[i] != reduce(s) {
+			return false
+		}
+	}
+	return true
+}
+
 func shortHash(message string) uint64 {
 	// NOTE: after DC-EXP roots would contain hash reduced into field
 	// (as final result would be in field)
