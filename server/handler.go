@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -73,10 +74,17 @@ func handleStartDicemix(conn *websocket.Conn, response *commons.DiceMixResponse,
 	// increment the run
 	state.Run++
 	state.Peers = make([]utils.Peers, len(response.Peers)-1)
+	set := make(map[int32]struct{}, len(response.Peers)-1)
 	i := 0
 
 	// store peers ID's
 	for _, peer := range response.Peers {
+		if _, ok := set[peer.Id]; ok {
+			log.Fatal("Duplicate peer IDs:", peer.Id)
+			os.Exit(1)
+		}
+		set[peer.Id] = struct{}{}
+
 		if peer.Id != state.MyID {
 			state.Peers[i].ID = peer.Id
 			i++
