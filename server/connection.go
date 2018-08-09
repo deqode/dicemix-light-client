@@ -63,7 +63,10 @@ func connect() *websocket.Conn {
 func listener(c *websocket.Conn, state *utils.State) {
 	for {
 		_, message, err := c.ReadMessage()
-		checkError(err)
+		if err != nil {
+			log.Fatal("Connection closed")
+			os.Exit(1)
+		}
 
 		response := &commons.GenericResponse{}
 		err = proto.Unmarshal(message, response)

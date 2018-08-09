@@ -29,6 +29,7 @@ message RegisterResponse {
 // StartDiceMix - Code S_START_DICEMIX 
 // KeyExchangeResponse - Code S_KEY_EXCHANGE
 // DCSimpleResponse - Code S_SIMPLE_DC_VECTOR
+// ConfirmationRequest - Code S_TX_CONFIRMATION
 message DiceMixResponse {
   uint32 Code = 1;
   repeated PeersInfo Peers = 2;
@@ -45,6 +46,8 @@ message PeersInfo {
   repeated uint64 DCVector = 4;
   repeated bytes DCSimpleVector = 5;
   bool OK = 6;
+  repeated bytes Messages = 7;
+  bool Confirm = 8;
 }
 
 // For broadcasting our public key
@@ -87,5 +90,16 @@ message DCSimpleRequest {
   sint32 Id = 2;
   repeated bytes DCSimpleVector = 3;
   bool MyOk = 4;
+  string Timestamp = 5;
+}
+
+
+// For broadcasting our confirmation for messages
+// C_TX_CONFIRMATION
+message ConfirmationRequest {
+  uint32 Code = 1;
+  sint32 Id = 2;
+  bool Confirm = 3;
+  repeated bytes Messages = 4;
   string Timestamp = 5;
 }

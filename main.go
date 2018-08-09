@@ -10,6 +10,8 @@ import (
 
 func main() {
 	// TODO: generate LTSK, LTPK
+	// Broadcast LTPK before KEPK
+	// sign all messages from LTSK
 
 	// initializes state info
 	var state = initialize()

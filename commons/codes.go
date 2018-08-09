@@ -6,7 +6,7 @@ const (
 	C_KEY_EXCHANGE     = 2
 	C_EXP_DC_VECTOR    = 3
 	C_SIMPLE_DC_VECTOR = 4
-	C_TX_SIGNATURE     = 5
+	C_TX_CONFIRMATION  = 5
 )
 
 // constant Response Codes
@@ -16,5 +16,5 @@ const (
 	S_KEY_EXCHANGE     = 102
 	S_EXP_DC_VECTOR    = 103
 	S_SIMPLE_DC_VECTOR = 104
-	S_JOINED_TX        = 105
+	S_TX_CONFIRMATION  = 105
 )

@@ -48,6 +48,12 @@ func handleMessage(conn *websocket.Conn, message []byte, code uint32, state *uti
 		err := proto.Unmarshal(message, response)
 		checkError(err)
 		handleDCSimpleResponse(conn, response, state)
+	case commons.S_TX_CONFIRMATION:
+		// conatins peers DC-SIMPLE-VECTOR's
+		response := &commons.DiceMixResponse{}
+		err := proto.Unmarshal(message, response)
+		checkError(err)
+		handleConfirmationResponse(conn, response, state)
 	}
 }
 
@@ -207,6 +213,48 @@ func handleDCSimpleResponse(conn *websocket.Conn, response *commons.DiceMixRespo
 	ok := iDcNet.VerifyProceed(state)
 
 	fmt.Printf("\nAgree to Proceed? = %v\n", ok)
+
+	// broadcast our Confirmation
+	confirmationRequest, err := proto.Marshal(&commons.ConfirmationRequest{
+		Code:      commons.C_TX_CONFIRMATION,
+		Id:        state.MyID,
+		Confirm:   ok,
+		Messages:  state.AllMessages,
+		Timestamp: timestamp(),
+	})
+
+	broadcast(conn, confirmationRequest, err)
+}
+
+// handles other peers Confirmations
+func handleConfirmationResponse(conn *websocket.Conn, response *commons.DiceMixResponse, state *utils.State) {
+	if response.Err != "" {
+		fmt.Fprintf(os.Stderr, "error: %v\n", response.Err)
+		os.Exit(1)
+	}
+
+	success := state.MyOk
+
+	// store other peers Confirmations
+	for i := 0; i < len(response.Peers); i++ {
+		for j := 0; j < len(state.Peers); j++ {
+			if response.Peers[i].Id == state.Peers[j].ID {
+				state.Peers[j].Confirm = response.Peers[i].Confirm
+				success = success && state.Peers[j].Confirm
+				fmt.Printf("RECV: Peer %v Confirmation - %v\n", state.Peers[j].ID, state.Peers[j].Confirm)
+				break
+			}
+		}
+	}
+
+	// if every peer agrees to continue
+	if success {
+		fmt.Printf("\n\nTransaction successfull. All peers agreed.\n\n")
+		conn.Close()
+	} else {
+		// else move to blame stage
+		fmt.Printf("\n\nError occured. Need to find the culprit\n\n")
+	}
 }
 
 // send request to server
