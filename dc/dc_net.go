@@ -2,6 +2,8 @@ package dc
 
 import (
 	"fmt"
+	"log"
+	"os"
 
 	"../field"
 	"../utils"
@@ -29,6 +31,11 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 
 	for _, peer := range state.Peers {
 		totalMsgsCount += peer.NumMsgs
+	}
+
+	if totalMsgsCount > 1000 {
+		log.Fatal("Limit Exceeded: More than 1000 messages in tx")
+		os.Exit(1)
 	}
 
 	for i := range slots {
