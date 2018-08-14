@@ -31,11 +31,6 @@ func initialize() utils.State {
 	state.MyMessages = make([]string, state.MyMsgCount)
 	state.MyMessagesHash = make([]uint64, state.MyMsgCount)
 
-	// generate random 160 bit message
-	for i := 0; i < int(state.MyMsgCount); i++ {
-		state.MyMessages[i] = utils.GenerateMessage()
-	}
-
 	return state
 }
 

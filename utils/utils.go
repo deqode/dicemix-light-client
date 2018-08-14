@@ -13,6 +13,7 @@ import (
 type Peers struct {
 	ID             int32
 	PubKey         []byte
+	NextPubKey     []byte
 	NumMsgs        uint32
 	SharedKey      []byte
 	Dicemix        rng.DiceMixRng
@@ -25,7 +26,6 @@ type Peers struct {
 type State struct {
 	Run            int
 	Peers          []Peers
-	ExcludedPeers  []uint64
 	TotalMsgsCount uint32
 	AllMsgHashes   []uint64
 	MyID           int32

@@ -77,13 +77,13 @@ func handleStartDicemix(conn *websocket.Conn, response *commons.DiceMixResponse,
 		os.Exit(1)
 	}
 
-	// increment the run
-	state.Run++
+	// initialize variables
 	state.Peers = make([]utils.Peers, len(response.Peers)-1)
 	set := make(map[int32]struct{}, len(response.Peers)-1)
 	i := 0
 
 	// store peers ID's
+	// check for duplicate peer id's
 	for _, peer := range response.Peers {
 		if _, ok := set[peer.Id]; ok {
 			log.Fatal("Duplicate peer IDs:", peer.Id)
@@ -98,7 +98,13 @@ func handleStartDicemix(conn *websocket.Conn, response *commons.DiceMixResponse,
 	}
 
 	// generates NIKE KeyPair for current run
-	iNike.GenerateKeys(state)
+	// mode = 0 to generate (my_kesk, my_kepk)
+	iNike.GenerateKeys(state, 0)
+
+	// generate random 160 bit message
+	for i := 0; i < int(state.MyMsgCount); i++ {
+		state.MyMessages[i] = utils.GenerateMessage()
+	}
 
 	fmt.Printf("MY KEPK - %v\n", state.Kepk)
 	fmt.Printf("MY MESSAGE - %v\n\n", utils.Base58StringToBytes(state.MyMessages[0]))
@@ -125,18 +131,9 @@ func handleKeyExchangeResponse(conn *websocket.Conn, response *commons.DiceMixRe
 		os.Exit(1)
 	}
 
+	// copies peers info returned from server to local state.Peers
 	// store peers PublicKey and NumMsgs
-	for i := 0; i < len(response.Peers); i++ {
-		for j := 0; j < len(state.Peers); j++ {
-			if response.Peers[i].Id == state.Peers[j].ID {
-				state.Peers[j].PubKey = response.Peers[i].PublicKey
-				state.Peers[j].NumMsgs = response.Peers[i].NumMsgs
-
-				fmt.Printf("RECV: Peer %v PK - %v\n", state.Peers[j].ID, state.Peers[j].PubKey)
-				break
-			}
-		}
-	}
+	filterPeers(state, response.Peers)
 
 	// derive shared keys with peers
 	iNike.DeriveSharedKeys(state)
@@ -172,12 +169,20 @@ func handleDCExpResponse(conn *websocket.Conn, response *commons.DCExpResponse, 
 	// run a SIMPLE DC NET
 	iDcNet.RunDCSimple(state)
 
+	if state.NextKepk == nil {
+		// generates NIKE KeyPair for next run
+		// mode = 1 to generate (my_next_kesk, my_next_kepk)
+		iNike.GenerateKeys(state, 1)
+	}
+
 	// broadcast our DC SIMPLE Vector
+	ecdh := ecdh.NewCurve25519ECDH()
 	dcSimpleRequest, err := proto.Marshal(&commons.DCSimpleRequest{
 		Code:           commons.C_SIMPLE_DC_VECTOR,
 		Id:             state.MyID,
 		DCSimpleVector: state.DCSimpleVector,
 		MyOk:           state.MyOk,
+		NextPublicKey:  ecdh.Marshal(state.NextKepk),
 		Timestamp:      timestamp(),
 	})
 
@@ -192,18 +197,9 @@ func handleDCSimpleResponse(conn *websocket.Conn, response *commons.DiceMixRespo
 		os.Exit(1)
 	}
 
+	// copies peers info returned from server to local state.Peers
 	// store other peers DC Simple Vectors
-	for i := 0; i < len(response.Peers); i++ {
-		for j := 0; j < len(state.Peers); j++ {
-			if response.Peers[i].Id == state.Peers[j].ID {
-				state.Peers[j].DCSimpleVector = response.Peers[i].DCSimpleVector
-				state.Peers[j].Ok = response.Peers[i].OK
-
-				fmt.Printf("RECV: Peer %v OK - %v\nDC-SIMPLE - %v\n", state.Peers[j].ID, state.Peers[j].Ok, state.Peers[j].DCSimpleVector)
-				break
-			}
-		}
-	}
+	filterPeers(state, response.Peers)
 
 	// finally resolves DC Net Vectors to obtain messages
 	// should contain all honest peers messages in absence of malicious peers
@@ -235,16 +231,12 @@ func handleConfirmationResponse(conn *websocket.Conn, response *commons.DiceMixR
 
 	success := state.MyOk
 
+	// copies peers info returned from server to local state.Peers
 	// store other peers Confirmations
-	for i := 0; i < len(response.Peers); i++ {
-		for j := 0; j < len(state.Peers); j++ {
-			if response.Peers[i].Id == state.Peers[j].ID {
-				state.Peers[j].Confirm = response.Peers[i].Confirm
-				success = success && state.Peers[j].Confirm
-				fmt.Printf("RECV: Peer %v Confirmation - %v\n", state.Peers[j].ID, state.Peers[j].Confirm)
-				break
-			}
-		}
+	filterPeers(state, response.Peers)
+
+	for i := 0; i < len(state.Peers); i++ {
+		success = success && state.Peers[i].Confirm
 	}
 
 	// if every peer agrees to continue
