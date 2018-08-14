@@ -101,13 +101,7 @@ func handleStartDicemix(conn *websocket.Conn, response *commons.DiceMixResponse,
 	// mode = 0 to generate (my_kesk, my_kepk)
 	iNike.GenerateKeys(state, 0)
 
-	// generate random 160 bit message
-	for i := 0; i < int(state.MyMsgCount); i++ {
-		state.MyMessages[i] = utils.GenerateMessage()
-	}
-
 	fmt.Printf("MY KEPK - %v\n", state.Kepk)
-	fmt.Printf("MY MESSAGE - %v\n\n", utils.Base58StringToBytes(state.MyMessages[0]))
 
 	// KeyExchange
 	// broadcast our NIKE PublicKey with our peers
@@ -131,6 +125,13 @@ func handleKeyExchangeResponse(conn *websocket.Conn, response *commons.DiceMixRe
 		os.Exit(1)
 	}
 
+	// generate random 160 bit message
+	for i := 0; i < int(state.MyMsgCount); i++ {
+		state.MyMessages[i] = utils.GenerateMessage()
+	}
+
+	fmt.Printf("MY MESSAGE - %v\n\n", utils.Base58StringToBytes(state.MyMessages[0]))
+
 	// copies peers info returned from server to local state.Peers
 	// store peers PublicKey and NumMsgs
 	filterPeers(state, response.Peers)
@@ -151,6 +152,7 @@ func handleKeyExchangeResponse(conn *websocket.Conn, response *commons.DiceMixRe
 	})
 
 	// broadcast our my_dc[]
+	log.Printf("BR DC EXP")
 	broadcast(conn, dcExpRequest, err)
 }
 
