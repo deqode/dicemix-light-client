@@ -22,11 +22,17 @@ func NewNike() NIKE {
 // KeyExchange -- generates random NIKE keypair, message
 // broadcasts self public-key
 // receive other peers public-keys[]
-func (n *nike) GenerateKeys(state *utils.State) {
+// mode = 0 to generate (my_kesk, my_kepk)
+// mode = 1 to generate (my_next_kesk, my_next_kepk)
+func (n *nike) GenerateKeys(state *utils.State, mode int) {
 	// generate random key pair
 	ecdh := ecdh.NewCurve25519ECDH()
 	var err error
-	(*state).Kesk, (*state).Kepk, err = ecdh.GenerateKeyPair()
+	if mode == 0 {
+		(*state).Kesk, (*state).Kepk, err = ecdh.GenerateKeyPair()
+	} else if mode == 1 {
+		(*state).NextKesk, (*state).NextKepk, err = ecdh.GenerateKeyPair()
+	}
 
 	if err != nil {
 		log.Fatalf("Error: generating NIKE key pair %v", err)
