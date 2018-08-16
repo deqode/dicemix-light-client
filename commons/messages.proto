@@ -42,14 +42,15 @@ message DiceMixResponse {
 message PeersInfo {
   int32 Id = 1;
   bytes PublicKey = 2;
-  bytes NextPublicKey = 3;
-  uint32 NumMsgs = 4;
-  repeated uint64 DCVector = 5;
-  repeated bytes DCSimpleVector = 6;
-  bool OK = 7;
-  repeated bytes Messages = 8;
-  bool Confirm = 9;
-  bool MessageReceived = 10;
+  bytes PrivateKey = 3;
+  bytes NextPublicKey = 4;
+  uint32 NumMsgs = 5;
+  repeated uint64 DCVector = 6;
+  repeated bytes DCSimpleVector = 7;
+  bool OK = 8;
+  repeated bytes Messages = 9;
+  bytes Confirmation = 10;
+  bool MessageReceived = 11;
 }
 
 // For broadcasting our public key
@@ -102,7 +103,36 @@ message DCSimpleRequest {
 message ConfirmationRequest {
   uint32 Code = 1;
   sint32 Id = 2;
-  bool Confirm = 3;
+  bytes Confirmation = 3;
   repeated bytes Messages = 4;
   string Timestamp = 5;
+}
+
+// Possible response against ConfirmationRequest
+// only when all peers send valid confirmations to server
+// Code - S_TX_SUCCESSFUL
+message TXDoneResponse {
+  uint32 Code = 1;
+  repeated bytes Messages = 2;
+  string Timestamp = 3;
+  string Message = 4;
+  string Err = 5;
+}
+
+// message sent by server
+// to initiate KESK
+message InitiaiteKESK {
+  uint32 Code = 1;
+  string Timestamp = 2;
+  string Message = 3;
+  string Err = 4;
+}
+
+// For broadcasting our KESK
+// to initiate BLAME
+message InitiaiteKESKResponse {
+  uint32 Code = 1;
+  sint32 Id = 2;
+  bytes PrivateKey = 3;
+  string Timestamp = 4;
 }

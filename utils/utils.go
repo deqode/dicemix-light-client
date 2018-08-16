@@ -60,3 +60,5 @@ func BytesToBase58String(bytes []byte) string {
 func Base58StringToBytes(str string) []byte {
 	return base58.Decode(str)
 }
+
+func SetupLogging() {}

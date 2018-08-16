@@ -25,7 +25,7 @@ func filterPeers(state *utils.State, peers []*commons.PeersInfo) {
 				tempPeer.Dicemix = peersInfo[j].Dicemix
 				tempPeer.DCSimpleVector = peers[i].DCSimpleVector
 				tempPeer.Ok = peers[i].OK
-				tempPeer.Confirm = peers[i].Confirm
+				tempPeer.Confirmation = peers[i].Confirmation
 
 				state.Peers = append(state.Peers, tempPeer)
 				break

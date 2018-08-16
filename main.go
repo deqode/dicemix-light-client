@@ -6,9 +6,17 @@ import (
 
 	"./server"
 	"./utils"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
+	// setup logger
+	formatter := &log.TextFormatter{
+		FullTimestamp: true,
+	}
+	log.SetFormatter(formatter)
+
 	// TODO: generate LTSK, LTPK
 	// Broadcast LTPK before KEPK
 	// sign all messages from LTSK
@@ -16,6 +24,7 @@ func main() {
 	// initializes state info
 	var state = initialize()
 
+	log.Info("Attempt to connect to DiceMix Server")
 	var connection = server.NewConnection()
 	connection.Register(&state)
 }

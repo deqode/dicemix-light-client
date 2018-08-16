@@ -1,9 +1,8 @@
 package field
 
 import (
-	"log"
-
 	"github.com/cznic/mathutil"
+	log "github.com/sirupsen/logrus"
 )
 
 // UInt64 - GO basic object notation

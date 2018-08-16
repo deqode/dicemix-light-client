@@ -1,13 +1,12 @@
 package dc
 
 import (
-	"fmt"
-	"log"
 	"os"
 
 	"../field"
 	"../utils"
 	"github.com/shomali11/util/xhashes"
+	log "github.com/sirupsen/logrus"
 )
 
 // to expose DC-NET methods
@@ -82,7 +81,7 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 		state.DCSimpleVector[slots[j]] = utils.Base58StringToBytes(state.MyMessages[j])
 	}
 
-	fmt.Printf("\nSLOT's = %v\n\n", state.DCSimpleVector)
+	log.Info("Slot's = ", state.DCSimpleVector)
 
 	for i = 0; i < peersCount; i++ {
 		for j = 0; j < totalMsgsCount; j++ {
@@ -92,7 +91,7 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 		}
 	}
 
-	fmt.Printf("MY DC SIMPLE VECTOR = %v\n\n", state.DCSimpleVector)
+	log.Info("My DC-SIMPLE vector = ", state.DCSimpleVector)
 }
 
 // Resolve the DC-net
@@ -114,7 +113,7 @@ func (d *dcNet) ResolveDCNet(state *utils.State) {
 		}
 	}
 
-	fmt.Printf("\nMY RESOLVED DC NET VECTOR[] = %v\n", state.AllMessages)
+	log.Info("Resolved DC-NET vector = ", state.AllMessages)
 }
 
 // Run a DC-net with exponential encoding
@@ -158,7 +157,7 @@ func (d *dcNet) DeriveMyDCVector(state *utils.State) {
 		}
 	}
 
-	fmt.Printf("\nMY DC_VECTOR[] = %v\n", state.MyDC)
+	log.Info("My DC-EXP vector = ", state.MyDC)
 }
 
 // Verify that every peer agrees to proceed

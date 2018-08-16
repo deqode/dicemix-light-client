@@ -2,9 +2,7 @@ package server
 
 import (
 	"flag"
-	"log"
 	"net/url"
-	"os"
 
 	"../commons"
 	"../dc"
@@ -12,6 +10,8 @@ import (
 	"../utils"
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/websocket"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // server configurations
@@ -51,10 +51,11 @@ func initialize() {
 // connects to server and extablishes a web socket connection
 func connect() *websocket.Conn {
 	url := url.URL{Scheme: "ws", Host: *addr, Path: "/ws"}
-	log.Printf("Connecting to %s", url.String())
+	log.Info("Connecting to ", url.String())
 	conn, _, err := dialer.Dial(url.String(), nil)
-
 	checkError(err)
+
+	log.Info("Connected to ", url.String())
 
 	return conn
 }
@@ -64,8 +65,7 @@ func listener(c *websocket.Conn, state *utils.State) {
 	for {
 		_, message, err := c.ReadMessage()
 		if err != nil {
-			log.Fatal("Connection closed")
-			os.Exit(1)
+			log.Fatalf("Connection closed - %v", err)
 		}
 
 		response := &commons.GenericResponse{}
@@ -82,7 +82,6 @@ func listener(c *websocket.Conn, state *utils.State) {
 // exists program if one found
 func checkError(err error) {
 	if err != nil {
-		log.Fatal("Error Occured:", err)
-		os.Exit(1)
+		log.Fatalf("Error - %v", err)
 	}
 }

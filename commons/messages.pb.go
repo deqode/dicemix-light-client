@@ -31,7 +31,7 @@ func (m *GenericResponse) Reset()         { *m = GenericResponse{} }
 func (m *GenericResponse) String() string { return proto.CompactTextString(m) }
 func (*GenericResponse) ProtoMessage()    {}
 func (*GenericResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_363bba34fbb5f985, []int{0}
+	return fileDescriptor_messages_5938f5f6e664e887, []int{0}
 }
 func (m *GenericResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GenericResponse.Unmarshal(m, b)
@@ -72,7 +72,7 @@ func (m *GenericRequest) Reset()         { *m = GenericRequest{} }
 func (m *GenericRequest) String() string { return proto.CompactTextString(m) }
 func (*GenericRequest) ProtoMessage()    {}
 func (*GenericRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_363bba34fbb5f985, []int{1}
+	return fileDescriptor_messages_5938f5f6e664e887, []int{1}
 }
 func (m *GenericRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GenericRequest.Unmarshal(m, b)
@@ -116,7 +116,7 @@ func (m *RegisterResponse) Reset()         { *m = RegisterResponse{} }
 func (m *RegisterResponse) String() string { return proto.CompactTextString(m) }
 func (*RegisterResponse) ProtoMessage()    {}
 func (*RegisterResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_363bba34fbb5f985, []int{2}
+	return fileDescriptor_messages_5938f5f6e664e887, []int{2}
 }
 func (m *RegisterResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RegisterResponse.Unmarshal(m, b)
@@ -191,7 +191,7 @@ func (m *DiceMixResponse) Reset()         { *m = DiceMixResponse{} }
 func (m *DiceMixResponse) String() string { return proto.CompactTextString(m) }
 func (*DiceMixResponse) ProtoMessage()    {}
 func (*DiceMixResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_363bba34fbb5f985, []int{3}
+	return fileDescriptor_messages_5938f5f6e664e887, []int{3}
 }
 func (m *DiceMixResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DiceMixResponse.Unmarshal(m, b)
@@ -250,14 +250,15 @@ func (m *DiceMixResponse) GetErr() string {
 type PeersInfo struct {
 	Id                   int32    `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`
 	PublicKey            []byte   `protobuf:"bytes,2,opt,name=PublicKey,proto3" json:"PublicKey,omitempty"`
-	NextPublicKey        []byte   `protobuf:"bytes,3,opt,name=NextPublicKey,proto3" json:"NextPublicKey,omitempty"`
-	NumMsgs              uint32   `protobuf:"varint,4,opt,name=NumMsgs,proto3" json:"NumMsgs,omitempty"`
-	DCVector             []uint64 `protobuf:"varint,5,rep,packed,name=DCVector,proto3" json:"DCVector,omitempty"`
-	DCSimpleVector       [][]byte `protobuf:"bytes,6,rep,name=DCSimpleVector,proto3" json:"DCSimpleVector,omitempty"`
-	OK                   bool     `protobuf:"varint,7,opt,name=OK,proto3" json:"OK,omitempty"`
-	Messages             [][]byte `protobuf:"bytes,8,rep,name=Messages,proto3" json:"Messages,omitempty"`
-	Confirm              bool     `protobuf:"varint,9,opt,name=Confirm,proto3" json:"Confirm,omitempty"`
-	MessageReceived      bool     `protobuf:"varint,10,opt,name=MessageReceived,proto3" json:"MessageReceived,omitempty"`
+	PrivateKey           []byte   `protobuf:"bytes,3,opt,name=PrivateKey,proto3" json:"PrivateKey,omitempty"`
+	NextPublicKey        []byte   `protobuf:"bytes,4,opt,name=NextPublicKey,proto3" json:"NextPublicKey,omitempty"`
+	NumMsgs              uint32   `protobuf:"varint,5,opt,name=NumMsgs,proto3" json:"NumMsgs,omitempty"`
+	DCVector             []uint64 `protobuf:"varint,6,rep,packed,name=DCVector,proto3" json:"DCVector,omitempty"`
+	DCSimpleVector       [][]byte `protobuf:"bytes,7,rep,name=DCSimpleVector,proto3" json:"DCSimpleVector,omitempty"`
+	OK                   bool     `protobuf:"varint,8,opt,name=OK,proto3" json:"OK,omitempty"`
+	Messages             [][]byte `protobuf:"bytes,9,rep,name=Messages,proto3" json:"Messages,omitempty"`
+	Confirmation         []byte   `protobuf:"bytes,10,opt,name=Confirmation,proto3" json:"Confirmation,omitempty"`
+	MessageReceived      bool     `protobuf:"varint,11,opt,name=MessageReceived,proto3" json:"MessageReceived,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -267,7 +268,7 @@ func (m *PeersInfo) Reset()         { *m = PeersInfo{} }
 func (m *PeersInfo) String() string { return proto.CompactTextString(m) }
 func (*PeersInfo) ProtoMessage()    {}
 func (*PeersInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_363bba34fbb5f985, []int{4}
+	return fileDescriptor_messages_5938f5f6e664e887, []int{4}
 }
 func (m *PeersInfo) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PeersInfo.Unmarshal(m, b)
@@ -297,6 +298,13 @@ func (m *PeersInfo) GetId() int32 {
 func (m *PeersInfo) GetPublicKey() []byte {
 	if m != nil {
 		return m.PublicKey
+	}
+	return nil
+}
+
+func (m *PeersInfo) GetPrivateKey() []byte {
+	if m != nil {
+		return m.PrivateKey
 	}
 	return nil
 }
@@ -343,11 +351,11 @@ func (m *PeersInfo) GetMessages() [][]byte {
 	return nil
 }
 
-func (m *PeersInfo) GetConfirm() bool {
+func (m *PeersInfo) GetConfirmation() []byte {
 	if m != nil {
-		return m.Confirm
+		return m.Confirmation
 	}
-	return false
+	return nil
 }
 
 func (m *PeersInfo) GetMessageReceived() bool {
@@ -375,7 +383,7 @@ func (m *KeyExchangeRequest) Reset()         { *m = KeyExchangeRequest{} }
 func (m *KeyExchangeRequest) String() string { return proto.CompactTextString(m) }
 func (*KeyExchangeRequest) ProtoMessage()    {}
 func (*KeyExchangeRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_363bba34fbb5f985, []int{5}
+	return fileDescriptor_messages_5938f5f6e664e887, []int{5}
 }
 func (m *KeyExchangeRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_KeyExchangeRequest.Unmarshal(m, b)
@@ -447,7 +455,7 @@ func (m *DCExpRequest) Reset()         { *m = DCExpRequest{} }
 func (m *DCExpRequest) String() string { return proto.CompactTextString(m) }
 func (*DCExpRequest) ProtoMessage()    {}
 func (*DCExpRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_363bba34fbb5f985, []int{6}
+	return fileDescriptor_messages_5938f5f6e664e887, []int{6}
 }
 func (m *DCExpRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DCExpRequest.Unmarshal(m, b)
@@ -513,7 +521,7 @@ func (m *DCExpResponse) Reset()         { *m = DCExpResponse{} }
 func (m *DCExpResponse) String() string { return proto.CompactTextString(m) }
 func (*DCExpResponse) ProtoMessage()    {}
 func (*DCExpResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_363bba34fbb5f985, []int{7}
+	return fileDescriptor_messages_5938f5f6e664e887, []int{7}
 }
 func (m *DCExpResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DCExpResponse.Unmarshal(m, b)
@@ -587,7 +595,7 @@ func (m *DCSimpleRequest) Reset()         { *m = DCSimpleRequest{} }
 func (m *DCSimpleRequest) String() string { return proto.CompactTextString(m) }
 func (*DCSimpleRequest) ProtoMessage()    {}
 func (*DCSimpleRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_363bba34fbb5f985, []int{8}
+	return fileDescriptor_messages_5938f5f6e664e887, []int{8}
 }
 func (m *DCSimpleRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DCSimpleRequest.Unmarshal(m, b)
@@ -654,7 +662,7 @@ func (m *DCSimpleRequest) GetTimestamp() string {
 type ConfirmationRequest struct {
 	Code                 uint32   `protobuf:"varint,1,opt,name=Code,proto3" json:"Code,omitempty"`
 	Id                   int32    `protobuf:"zigzag32,2,opt,name=Id,proto3" json:"Id,omitempty"`
-	Confirm              bool     `protobuf:"varint,3,opt,name=Confirm,proto3" json:"Confirm,omitempty"`
+	Confirmation         []byte   `protobuf:"bytes,3,opt,name=Confirmation,proto3" json:"Confirmation,omitempty"`
 	Messages             [][]byte `protobuf:"bytes,4,rep,name=Messages,proto3" json:"Messages,omitempty"`
 	Timestamp            string   `protobuf:"bytes,5,opt,name=Timestamp,proto3" json:"Timestamp,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -666,7 +674,7 @@ func (m *ConfirmationRequest) Reset()         { *m = ConfirmationRequest{} }
 func (m *ConfirmationRequest) String() string { return proto.CompactTextString(m) }
 func (*ConfirmationRequest) ProtoMessage()    {}
 func (*ConfirmationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_messages_363bba34fbb5f985, []int{9}
+	return fileDescriptor_messages_5938f5f6e664e887, []int{9}
 }
 func (m *ConfirmationRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ConfirmationRequest.Unmarshal(m, b)
@@ -700,11 +708,11 @@ func (m *ConfirmationRequest) GetId() int32 {
 	return 0
 }
 
-func (m *ConfirmationRequest) GetConfirm() bool {
+func (m *ConfirmationRequest) GetConfirmation() []byte {
 	if m != nil {
-		return m.Confirm
+		return m.Confirmation
 	}
-	return false
+	return nil
 }
 
 func (m *ConfirmationRequest) GetMessages() [][]byte {
@@ -715,6 +723,207 @@ func (m *ConfirmationRequest) GetMessages() [][]byte {
 }
 
 func (m *ConfirmationRequest) GetTimestamp() string {
+	if m != nil {
+		return m.Timestamp
+	}
+	return ""
+}
+
+// Possible response against ConfirmationRequest
+// only when all peers send valid confirmations to server
+// Code - S_TX_SUCCESSFUL
+type TXDoneResponse struct {
+	Code                 uint32   `protobuf:"varint,1,opt,name=Code,proto3" json:"Code,omitempty"`
+	Messages             [][]byte `protobuf:"bytes,2,rep,name=Messages,proto3" json:"Messages,omitempty"`
+	Timestamp            string   `protobuf:"bytes,3,opt,name=Timestamp,proto3" json:"Timestamp,omitempty"`
+	Message              string   `protobuf:"bytes,4,opt,name=Message,proto3" json:"Message,omitempty"`
+	Err                  string   `protobuf:"bytes,5,opt,name=Err,proto3" json:"Err,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *TXDoneResponse) Reset()         { *m = TXDoneResponse{} }
+func (m *TXDoneResponse) String() string { return proto.CompactTextString(m) }
+func (*TXDoneResponse) ProtoMessage()    {}
+func (*TXDoneResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_messages_5938f5f6e664e887, []int{10}
+}
+func (m *TXDoneResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_TXDoneResponse.Unmarshal(m, b)
+}
+func (m *TXDoneResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_TXDoneResponse.Marshal(b, m, deterministic)
+}
+func (dst *TXDoneResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TXDoneResponse.Merge(dst, src)
+}
+func (m *TXDoneResponse) XXX_Size() int {
+	return xxx_messageInfo_TXDoneResponse.Size(m)
+}
+func (m *TXDoneResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_TXDoneResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_TXDoneResponse proto.InternalMessageInfo
+
+func (m *TXDoneResponse) GetCode() uint32 {
+	if m != nil {
+		return m.Code
+	}
+	return 0
+}
+
+func (m *TXDoneResponse) GetMessages() [][]byte {
+	if m != nil {
+		return m.Messages
+	}
+	return nil
+}
+
+func (m *TXDoneResponse) GetTimestamp() string {
+	if m != nil {
+		return m.Timestamp
+	}
+	return ""
+}
+
+func (m *TXDoneResponse) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
+func (m *TXDoneResponse) GetErr() string {
+	if m != nil {
+		return m.Err
+	}
+	return ""
+}
+
+// message sent by server
+// to initiate KESK
+type InitiaiteKESK struct {
+	Code                 uint32   `protobuf:"varint,1,opt,name=Code,proto3" json:"Code,omitempty"`
+	Timestamp            string   `protobuf:"bytes,2,opt,name=Timestamp,proto3" json:"Timestamp,omitempty"`
+	Message              string   `protobuf:"bytes,3,opt,name=Message,proto3" json:"Message,omitempty"`
+	Err                  string   `protobuf:"bytes,4,opt,name=Err,proto3" json:"Err,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *InitiaiteKESK) Reset()         { *m = InitiaiteKESK{} }
+func (m *InitiaiteKESK) String() string { return proto.CompactTextString(m) }
+func (*InitiaiteKESK) ProtoMessage()    {}
+func (*InitiaiteKESK) Descriptor() ([]byte, []int) {
+	return fileDescriptor_messages_5938f5f6e664e887, []int{11}
+}
+func (m *InitiaiteKESK) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_InitiaiteKESK.Unmarshal(m, b)
+}
+func (m *InitiaiteKESK) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_InitiaiteKESK.Marshal(b, m, deterministic)
+}
+func (dst *InitiaiteKESK) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InitiaiteKESK.Merge(dst, src)
+}
+func (m *InitiaiteKESK) XXX_Size() int {
+	return xxx_messageInfo_InitiaiteKESK.Size(m)
+}
+func (m *InitiaiteKESK) XXX_DiscardUnknown() {
+	xxx_messageInfo_InitiaiteKESK.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_InitiaiteKESK proto.InternalMessageInfo
+
+func (m *InitiaiteKESK) GetCode() uint32 {
+	if m != nil {
+		return m.Code
+	}
+	return 0
+}
+
+func (m *InitiaiteKESK) GetTimestamp() string {
+	if m != nil {
+		return m.Timestamp
+	}
+	return ""
+}
+
+func (m *InitiaiteKESK) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
+func (m *InitiaiteKESK) GetErr() string {
+	if m != nil {
+		return m.Err
+	}
+	return ""
+}
+
+// For broadcasting our KESK
+// to initiate BLAME
+type InitiaiteKESKResponse struct {
+	Code                 uint32   `protobuf:"varint,1,opt,name=Code,proto3" json:"Code,omitempty"`
+	Id                   int32    `protobuf:"zigzag32,2,opt,name=Id,proto3" json:"Id,omitempty"`
+	PrivateKey           []byte   `protobuf:"bytes,3,opt,name=PrivateKey,proto3" json:"PrivateKey,omitempty"`
+	Timestamp            string   `protobuf:"bytes,4,opt,name=Timestamp,proto3" json:"Timestamp,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *InitiaiteKESKResponse) Reset()         { *m = InitiaiteKESKResponse{} }
+func (m *InitiaiteKESKResponse) String() string { return proto.CompactTextString(m) }
+func (*InitiaiteKESKResponse) ProtoMessage()    {}
+func (*InitiaiteKESKResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_messages_5938f5f6e664e887, []int{12}
+}
+func (m *InitiaiteKESKResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_InitiaiteKESKResponse.Unmarshal(m, b)
+}
+func (m *InitiaiteKESKResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_InitiaiteKESKResponse.Marshal(b, m, deterministic)
+}
+func (dst *InitiaiteKESKResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InitiaiteKESKResponse.Merge(dst, src)
+}
+func (m *InitiaiteKESKResponse) XXX_Size() int {
+	return xxx_messageInfo_InitiaiteKESKResponse.Size(m)
+}
+func (m *InitiaiteKESKResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_InitiaiteKESKResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_InitiaiteKESKResponse proto.InternalMessageInfo
+
+func (m *InitiaiteKESKResponse) GetCode() uint32 {
+	if m != nil {
+		return m.Code
+	}
+	return 0
+}
+
+func (m *InitiaiteKESKResponse) GetId() int32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *InitiaiteKESKResponse) GetPrivateKey() []byte {
+	if m != nil {
+		return m.PrivateKey
+	}
+	return nil
+}
+
+func (m *InitiaiteKESKResponse) GetTimestamp() string {
 	if m != nil {
 		return m.Timestamp
 	}
@@ -732,43 +941,51 @@ func init() {
 	proto.RegisterType((*DCExpResponse)(nil), "commons.DCExpResponse")
 	proto.RegisterType((*DCSimpleRequest)(nil), "commons.DCSimpleRequest")
 	proto.RegisterType((*ConfirmationRequest)(nil), "commons.ConfirmationRequest")
+	proto.RegisterType((*TXDoneResponse)(nil), "commons.TXDoneResponse")
+	proto.RegisterType((*InitiaiteKESK)(nil), "commons.InitiaiteKESK")
+	proto.RegisterType((*InitiaiteKESKResponse)(nil), "commons.InitiaiteKESKResponse")
 }
 
-func init() { proto.RegisterFile("commons/messages.proto", fileDescriptor_messages_363bba34fbb5f985) }
+func init() { proto.RegisterFile("commons/messages.proto", fileDescriptor_messages_5938f5f6e664e887) }
 
-var fileDescriptor_messages_363bba34fbb5f985 = []byte{
-	// 517 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0xcb, 0x8e, 0xd3, 0x30,
-	0x18, 0x85, 0xe5, 0x5c, 0x7a, 0xf9, 0xa7, 0x97, 0xc1, 0x20, 0x64, 0x21, 0x16, 0x51, 0x34, 0xa0,
-	0xac, 0x8a, 0x04, 0x8f, 0xd0, 0x56, 0xa8, 0xaa, 0x3a, 0x1d, 0x19, 0xc4, 0xbe, 0x93, 0xfe, 0x53,
-	0x2c, 0x26, 0x71, 0x88, 0x53, 0xd4, 0xee, 0x90, 0x58, 0xc3, 0x9e, 0x87, 0x60, 0xc9, 0xfb, 0xa1,
-	0xb8, 0xee, 0x25, 0x99, 0x10, 0x51, 0x89, 0x9d, 0xff, 0xd3, 0x63, 0xf7, 0xf8, 0xe4, 0x4b, 0xe0,
-	0x69, 0x28, 0xa3, 0x48, 0xc6, 0xea, 0x55, 0x84, 0x4a, 0x2d, 0x56, 0xa8, 0x06, 0x49, 0x2a, 0x33,
-	0x49, 0x9b, 0x46, 0xf7, 0x5f, 0x40, 0xff, 0x2d, 0xc6, 0x98, 0x8a, 0x90, 0xa3, 0x4a, 0x64, 0xac,
-	0x90, 0x52, 0x70, 0x86, 0x72, 0x89, 0x8c, 0x78, 0x24, 0xe8, 0x72, 0xbd, 0xf6, 0xaf, 0xa0, 0x77,
-	0xb0, 0x7d, 0x5e, 0xa3, 0xca, 0x2a, 0x5d, 0x5f, 0x09, 0x5c, 0x72, 0x5c, 0x09, 0x95, 0x61, 0x5a,
-	0x77, 0x1c, 0xed, 0x81, 0x35, 0x59, 0x32, 0xcb, 0x23, 0xc1, 0x23, 0x6e, 0x4d, 0x96, 0xf4, 0x39,
-	0xb4, 0xdf, 0x8b, 0x08, 0x55, 0xb6, 0x88, 0x12, 0x66, 0x7b, 0x24, 0x68, 0xf3, 0xa3, 0x40, 0x19,
-	0x34, 0x67, 0xbb, 0xf8, 0xcc, 0xd1, 0xbf, 0xed, 0x47, 0x7a, 0x09, 0xf6, 0x38, 0x4d, 0x99, 0xab,
-	0xd5, 0x7c, 0xe9, 0xff, 0x24, 0xd0, 0x1f, 0x89, 0x10, 0x67, 0x62, 0x53, 0x9b, 0x20, 0x00, 0xf7,
-	0x06, 0x31, 0x55, 0xcc, 0xf2, 0xec, 0xe0, 0xe2, 0x35, 0x1d, 0x98, 0x42, 0x06, 0x5a, 0x9d, 0xc4,
-	0x77, 0x92, 0xef, 0x0c, 0xc5, 0x6c, 0x4e, 0x4d, 0x36, 0xb7, 0x32, 0x5b, 0xe3, 0x98, 0xed, 0x97,
-	0x05, 0xed, 0xc3, 0xf1, 0xa6, 0x83, 0x3c, 0x93, 0xbb, 0xef, 0xe0, 0x66, 0x7d, 0x7b, 0x2f, 0xc2,
-	0x29, 0x6e, 0x75, 0x35, 0x1d, 0x7e, 0x14, 0xe8, 0x15, 0x74, 0xaf, 0x71, 0x93, 0x1d, 0x1d, 0xb6,
-	0x76, 0x14, 0xc5, 0x3c, 0xcd, 0xf5, 0x3a, 0x9a, 0xa9, 0x95, 0xd2, 0x49, 0xbb, 0x7c, 0x3f, 0xd2,
-	0x67, 0xd0, 0x1a, 0x0d, 0x3f, 0x60, 0x98, 0xc9, 0xbc, 0x2e, 0x3b, 0x70, 0xf8, 0x61, 0xa6, 0x2f,
-	0xa1, 0x37, 0x1a, 0xbe, 0x13, 0x51, 0x72, 0x8f, 0xc6, 0xd1, 0xf0, 0xec, 0xa0, 0xc3, 0x4b, 0x6a,
-	0x9e, 0x78, 0x3e, 0x65, 0x4d, 0x8f, 0x04, 0x2d, 0x6e, 0xcd, 0xa7, 0xf9, 0x99, 0xe6, 0xb2, 0x8a,
-	0xb5, 0xf4, 0x8e, 0xc3, 0x9c, 0x27, 0x19, 0xca, 0xf8, 0x4e, 0xa4, 0x11, 0x6b, 0xeb, 0x0d, 0xfb,
-	0x91, 0x06, 0xd0, 0x37, 0x2e, 0x8e, 0x21, 0x8a, 0x2f, 0xb8, 0x64, 0xa0, 0x1d, 0x65, 0xd9, 0xff,
-	0x41, 0x80, 0x4e, 0x71, 0x3b, 0xde, 0x84, 0x1f, 0x17, 0x71, 0xae, 0xff, 0x95, 0xbc, 0x2a, 0xa0,
-	0xca, 0x55, 0xb5, 0xff, 0xa5, 0xa6, 0xc2, 0xc3, 0x76, 0x4b, 0x0f, 0xdb, 0x4f, 0xa1, 0x33, 0x1a,
-	0x8e, 0x37, 0xc9, 0x39, 0x49, 0x3c, 0xb8, 0xd0, 0x7b, 0x4c, 0xb3, 0xb6, 0xee, 0xfe, 0x54, 0xaa,
-	0x07, 0xcc, 0xff, 0x46, 0xa0, 0x6b, 0xfe, 0xb4, 0x06, 0xe7, 0x27, 0xe0, 0x72, 0x29, 0xb3, 0x1d,
-	0xce, 0x0e, 0xdf, 0x0d, 0xff, 0xf1, 0xb5, 0xfa, 0x9d, 0xbf, 0x56, 0x86, 0x86, 0x73, 0x6e, 0xff,
-	0x10, 0x2d, 0xbb, 0x12, 0x2d, 0x0a, 0xce, 0x6c, 0x3b, 0xff, 0xa4, 0x83, 0xb4, 0xb8, 0x5e, 0x3f,
-	0x44, 0xde, 0xad, 0x42, 0xbe, 0x70, 0xc7, 0x46, 0xb9, 0xbd, 0xef, 0x04, 0x1e, 0x1b, 0xf0, 0x16,
-	0x99, 0x90, 0xf1, 0x39, 0xd9, 0x4f, 0x10, 0xb6, 0x8b, 0x08, 0x9f, 0x82, 0xef, 0x94, 0xc0, 0xaf,
-	0x25, 0xe8, 0xb6, 0xa1, 0x3f, 0xbf, 0x6f, 0xfe, 0x04, 0x00, 0x00, 0xff, 0xff, 0x71, 0xe2, 0xff,
-	0x21, 0x98, 0x05, 0x00, 0x00,
+var fileDescriptor_messages_5938f5f6e664e887 = []byte{
+	// 598 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0xc9, 0x8e, 0xd3, 0x40,
+	0x10, 0x95, 0xb7, 0x2c, 0x95, 0x6d, 0x68, 0x16, 0x59, 0x08, 0x21, 0xcb, 0x1a, 0x90, 0x4f, 0x41,
+	0x82, 0x4f, 0x48, 0x22, 0x14, 0x59, 0x99, 0x44, 0x3d, 0x23, 0xc4, 0xd5, 0xe3, 0xd4, 0x84, 0x16,
+	0x63, 0x77, 0x70, 0x3b, 0xa3, 0xe4, 0x86, 0xc4, 0x8d, 0x03, 0x57, 0xc4, 0x87, 0xf0, 0x2d, 0xfc,
+	0x0e, 0x72, 0xc7, 0x89, 0x97, 0x31, 0x46, 0x11, 0xdc, 0xba, 0x5e, 0x97, 0xab, 0x5e, 0xbf, 0x7e,
+	0xe5, 0x86, 0x27, 0x3e, 0x0f, 0x02, 0x1e, 0x8a, 0x57, 0x01, 0x0a, 0xe1, 0xad, 0x50, 0x0c, 0xd7,
+	0x11, 0x8f, 0x39, 0x69, 0xa6, 0xb8, 0xfd, 0x02, 0x06, 0x6f, 0x31, 0xc4, 0x88, 0xf9, 0x14, 0xc5,
+	0x9a, 0x87, 0x02, 0x09, 0x01, 0x7d, 0xc4, 0x97, 0x68, 0x2a, 0x96, 0xe2, 0xf4, 0xa8, 0x5c, 0xdb,
+	0xe7, 0xd0, 0x3f, 0xa6, 0x7d, 0xda, 0xa0, 0x88, 0x2b, 0xb3, 0x3e, 0x2b, 0x70, 0x46, 0x71, 0xc5,
+	0x44, 0x8c, 0x51, 0x5d, 0x39, 0xd2, 0x07, 0x75, 0xba, 0x34, 0x55, 0x4b, 0x71, 0x1e, 0x50, 0x75,
+	0xba, 0x24, 0xcf, 0xa0, 0x7d, 0xc5, 0x02, 0x14, 0xb1, 0x17, 0xac, 0x4d, 0xcd, 0x52, 0x9c, 0x36,
+	0xcd, 0x00, 0x62, 0x42, 0x73, 0xb6, 0xa7, 0x6f, 0xea, 0x72, 0xef, 0x10, 0x92, 0x33, 0xd0, 0x26,
+	0x51, 0x64, 0x1a, 0x12, 0x4d, 0x96, 0xf6, 0x0f, 0x05, 0x06, 0x63, 0xe6, 0xe3, 0x8c, 0x6d, 0x6b,
+	0x19, 0x38, 0x60, 0x2c, 0x10, 0x23, 0x61, 0xaa, 0x96, 0xe6, 0x74, 0x5e, 0x93, 0x61, 0x2a, 0xc8,
+	0x50, 0xa2, 0xd3, 0xf0, 0x86, 0xd3, 0x7d, 0x42, 0x91, 0x9b, 0x5e, 0xc3, 0xcd, 0xa8, 0xe4, 0xd6,
+	0xc8, 0xb8, 0xfd, 0x52, 0xa1, 0x7d, 0x2c, 0x9f, 0x6a, 0x90, 0x70, 0x32, 0x0e, 0x1a, 0x2c, 0x36,
+	0xd7, 0xb7, 0xcc, 0x77, 0x71, 0x27, 0xa5, 0xe9, 0xd2, 0x0c, 0x20, 0xcf, 0x01, 0x16, 0x11, 0xbb,
+	0xf3, 0x62, 0x4c, 0xb6, 0x35, 0xb9, 0x9d, 0x43, 0xc8, 0x39, 0xf4, 0x2e, 0x70, 0x1b, 0x67, 0x15,
+	0x74, 0x99, 0x52, 0x04, 0x13, 0xb6, 0x17, 0x9b, 0x60, 0x26, 0x56, 0x42, 0xb2, 0xed, 0xd1, 0x43,
+	0x48, 0x9e, 0x42, 0x6b, 0x3c, 0x7a, 0x87, 0x7e, 0xcc, 0x13, 0xca, 0x9a, 0xa3, 0xd3, 0x63, 0x4c,
+	0x5e, 0x42, 0x7f, 0x3c, 0xba, 0x64, 0xc1, 0xfa, 0x16, 0xd3, 0x8c, 0xa6, 0xa5, 0x39, 0x5d, 0x5a,
+	0x42, 0x93, 0x13, 0xcd, 0x5d, 0xb3, 0x65, 0x29, 0x4e, 0x8b, 0xaa, 0x73, 0x37, 0xa9, 0x99, 0x8a,
+	0x21, 0xcc, 0xb6, 0xfc, 0xe2, 0x18, 0x13, 0x1b, 0xba, 0x23, 0x1e, 0xde, 0xb0, 0x28, 0xf0, 0x62,
+	0xc6, 0x43, 0x13, 0x24, 0xdd, 0x02, 0x46, 0x1c, 0x18, 0xa4, 0xf9, 0x14, 0x7d, 0x64, 0x77, 0xb8,
+	0x34, 0x3b, 0xb2, 0x78, 0x19, 0xb6, 0xbf, 0x29, 0x40, 0x5c, 0xdc, 0x4d, 0xb6, 0xfe, 0x07, 0x2f,
+	0x4c, 0xf0, 0x3f, 0x7a, 0xb4, 0xca, 0x7a, 0x99, 0x68, 0x5a, 0x59, 0xf6, 0x9c, 0x60, 0x7a, 0x51,
+	0xb0, 0x82, 0x2d, 0x8c, 0x92, 0x2d, 0xec, 0x08, 0xba, 0xe3, 0xd1, 0x64, 0xbb, 0x3e, 0x85, 0x89,
+	0x05, 0x1d, 0xf9, 0x4d, 0xaa, 0xb1, 0x26, 0x6f, 0x21, 0x0f, 0xd5, 0x5b, 0xd1, 0xfe, 0xa2, 0x40,
+	0x2f, 0x6d, 0x5a, 0x63, 0xfc, 0x47, 0x60, 0x50, 0xce, 0xe3, 0xbd, 0xf1, 0x75, 0xba, 0x0f, 0xfe,
+	0xe3, 0x00, 0xfe, 0x4c, 0x06, 0x30, 0xf5, 0xc5, 0x29, 0xa7, 0xbf, 0x6f, 0x32, 0xad, 0xd2, 0x64,
+	0x04, 0xf4, 0xd9, 0x6e, 0xfe, 0x51, 0x12, 0x69, 0x51, 0xb9, 0xbe, 0x6f, 0x7e, 0xa3, 0xca, 0xfc,
+	0x85, 0x33, 0x36, 0xca, 0xea, 0x7d, 0x57, 0xe0, 0x61, 0xde, 0x7d, 0xa7, 0x70, 0x2f, 0x9b, 0x59,
+	0xab, 0x30, 0x73, 0x7e, 0x18, 0xf4, 0xd2, 0x30, 0xd4, 0x7b, 0xe9, 0xab, 0x02, 0xfd, 0xab, 0xf7,
+	0x63, 0x1e, 0x62, 0xed, 0xc5, 0xe6, 0x1b, 0xa8, 0x75, 0x0d, 0xfe, 0xe9, 0x7a, 0x03, 0xe8, 0x4d,
+	0x43, 0x16, 0x33, 0x8f, 0xc5, 0xe8, 0x4e, 0x2e, 0xdd, 0x4a, 0x2a, 0x85, 0x76, 0x6a, 0x4d, 0x3b,
+	0xad, 0xb2, 0x9d, 0x9e, 0xb5, 0xdb, 0xc1, 0xe3, 0x42, 0xbb, 0x93, 0x5e, 0x95, 0xbf, 0xfd, 0x33,
+	0x6b, 0xc7, 0xe9, 0xba, 0x21, 0x5f, 0xca, 0x37, 0xbf, 0x03, 0x00, 0x00, 0xff, 0xff, 0x28, 0xda,
+	0xce, 0x4a, 0x43, 0x07, 0x00, 0x00,
 }

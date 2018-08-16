@@ -1,12 +1,12 @@
 package nike
 
 import (
-	"log"
 	"sync"
 
 	"../ecdh"
 	"../rng"
 	"../utils"
+	log "github.com/sirupsen/logrus"
 )
 
 type nike struct {

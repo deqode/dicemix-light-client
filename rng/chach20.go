@@ -4,10 +4,9 @@ import (
 	"crypto/cipher"
 	"encoding/binary"
 	"encoding/hex"
-	"log"
-	"os"
 
 	"github.com/codahale/chacha20"
+	log "github.com/sirupsen/logrus"
 )
 
 // DiceMixRng -- data structure to hold stream
@@ -25,16 +24,14 @@ func NewRng(seed []byte) DiceMixRng {
 	nonce, err := hex.DecodeString(nonceHex)
 
 	if err != nil {
-		log.Fatal("Error Occured:", err)
-		os.Exit(1)
+		log.Fatal("Error Occured: ", err)
 	}
 
 	var dicemix = DiceMixRng{}
 	dicemix.chachaStream, dicemix.chachaStreamErr = chacha20.New(seed, nonce)
 
 	if dicemix.chachaStreamErr != nil {
-		log.Fatal("Error Occured:", err)
-		os.Exit(1)
+		log.Fatal("Error Occured: ", dicemix.chachaStreamErr)
 	}
 
 	// generate random number for DC Exponential by extracting first 8 bytes
