@@ -7,7 +7,9 @@ import (
 // ECDH - The main interface ECDH.
 type ECDH interface {
 	GenerateKeyPair() (crypto.PrivateKey, crypto.PublicKey, error)
-	Marshal(p crypto.PublicKey) []byte
-	Unmarshal(data []byte) (crypto.PublicKey, bool)
-	GenerateSharedSecret(privKey crypto.PrivateKey, pubKey crypto.PublicKey) ([]byte, error)
+	Marshal(crypto.PublicKey) []byte
+	MarshalSK(crypto.PrivateKey) []byte
+	Unmarshal([]byte) (crypto.PublicKey, bool)
+	GenerateSharedSecret(crypto.PrivateKey, crypto.PublicKey) ([]byte, error)
+	GenerateConfirmation([][]byte, crypto.PrivateKey) ([]byte, error)
 }

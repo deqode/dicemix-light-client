@@ -19,7 +19,7 @@ type Peers struct {
 	Dicemix        rng.DiceMixRng
 	DCSimpleVector [][]byte
 	Ok             bool
-	Confirm        bool
+	Confirmation   []byte
 }
 
 // State - stores state info for current run
