@@ -30,7 +30,7 @@ func (src UInt64) reduceOnce() UInt64 {
 func (src UInt64) reduceOnceAssert() UInt64 {
 	var res = src.reduceOnce()
 	if res >= P {
-		log.Fatal("Error: Expected result should be less than field size")
+		log.Fatalf("Error: Expected result should be less than field size %d >= %d", res, P)
 	}
 	return res
 }
