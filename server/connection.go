@@ -4,8 +4,8 @@ import (
 	"flag"
 	"net/url"
 
-	"../commons"
 	"../dc"
+	"../messages"
 	"../nike"
 	"../utils"
 	"github.com/golang/protobuf/proto"
@@ -68,7 +68,7 @@ func listener(c *websocket.Conn, state *utils.State) {
 			log.Fatalf("Connection closed - %v", err)
 		}
 
-		response := &commons.GenericResponse{}
+		response := &messages.GenericResponse{}
 		err = proto.Unmarshal(message, response)
 		checkError(err)
 

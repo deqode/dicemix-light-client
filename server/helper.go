@@ -1,13 +1,13 @@
 package server
 
 import (
-	"../commons"
+	"../messages"
 	"../utils"
 	"github.com/jinzhu/copier"
 )
 
 // copies peers info returned from server to local state.Peers
-func filterPeers(state *utils.State, peers []*commons.PeersInfo) {
+func filterPeers(state *utils.State, peers []*messages.PeersInfo) {
 	var peersInfo []utils.Peers
 	copier.Copy(&peersInfo, &state.Peers)
 	state.Peers = make([]utils.Peers, 0)

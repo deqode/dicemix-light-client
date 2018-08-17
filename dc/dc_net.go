@@ -157,6 +157,7 @@ func (d *dcNet) DeriveMyDCVector(state *utils.State) {
 		}
 	}
 
+	log.Info("My Msg Hashes = ", state.MyMessagesHash)
 	log.Info("My DC-EXP vector = ", state.MyDC)
 }
 

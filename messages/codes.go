@@ -1,4 +1,4 @@
-package commons
+package messages
 
 // constant Request Codes
 const (

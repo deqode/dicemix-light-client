@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package commons;
+package messages;
 
 // for obtaining Status Code from response messages from server
 // to parse response into suitable object

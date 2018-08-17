@@ -3,8 +3,8 @@ package server
 import (
 	"time"
 
-	"../commons"
 	"../ecdh"
+	"../messages"
 	"../utils"
 
 	"github.com/golang/protobuf/proto"
@@ -20,44 +20,44 @@ func handleMessage(conn *websocket.Conn, message []byte, code uint32, state *uti
 	}).Info("RECV:")
 
 	switch code {
-	case commons.S_JOIN_RESPONSE:
+	case messages.S_JOIN_RESPONSE:
 		// Response against request to join dicemix transaction
-		response := &commons.RegisterResponse{}
+		response := &messages.RegisterResponse{}
 		err := proto.Unmarshal(message, response)
 		checkError(err)
 		handleJoinResponse(response, state)
-	case commons.S_START_DICEMIX:
+	case messages.S_START_DICEMIX:
 		// Response to start DiceMix Run
-		response := &commons.DiceMixResponse{}
+		response := &messages.DiceMixResponse{}
 		err := proto.Unmarshal(message, response)
 		checkError(err)
 		handleStartDicemix(conn, response, state)
-	case commons.S_KEY_EXCHANGE:
+	case messages.S_KEY_EXCHANGE:
 		// Response against request for KeyExchange
-		response := &commons.DiceMixResponse{}
+		response := &messages.DiceMixResponse{}
 		err := proto.Unmarshal(message, response)
 		checkError(err)
 		handleKeyExchangeResponse(conn, response, state)
-	case commons.S_EXP_DC_VECTOR:
+	case messages.S_EXP_DC_VECTOR:
 		// contains roots of DC-Combined
-		response := &commons.DCExpResponse{}
+		response := &messages.DCExpResponse{}
 		err := proto.Unmarshal(message, response)
 		checkError(err)
 		handleDCExpResponse(conn, response, state)
-	case commons.S_SIMPLE_DC_VECTOR:
+	case messages.S_SIMPLE_DC_VECTOR:
 		// conatins peers DC-SIMPLE-VECTOR's
-		response := &commons.DiceMixResponse{}
+		response := &messages.DiceMixResponse{}
 		err := proto.Unmarshal(message, response)
 		checkError(err)
 		handleDCSimpleResponse(conn, response, state)
-	case commons.S_TX_SUCCESSFUL:
+	case messages.S_TX_SUCCESSFUL:
 		// conatins success message for TX
-		response := &commons.TXDoneResponse{}
+		response := &messages.TXDoneResponse{}
 		err := proto.Unmarshal(message, response)
 		checkError(err)
 		handleTXDoneResponse(conn, response, state)
-	case commons.S_KESK_REQUEST:
-		response := &commons.InitiaiteKESK{}
+	case messages.S_KESK_REQUEST:
+		response := &messages.InitiaiteKESK{}
 		err := proto.Unmarshal(message, response)
 		checkError(err)
 		handleKESKRequest(conn, response, state)
@@ -65,7 +65,7 @@ func handleMessage(conn *websocket.Conn, message []byte, code uint32, state *uti
 }
 
 // Response against request to join dicemix transaction
-func handleJoinResponse(response *commons.RegisterResponse, state *utils.State) {
+func handleJoinResponse(response *messages.RegisterResponse, state *utils.State) {
 	if response.Err != "" {
 		log.Fatal("Error- ", response.Err)
 	}
@@ -77,7 +77,7 @@ func handleJoinResponse(response *commons.RegisterResponse, state *utils.State) 
 }
 
 // Response to start DiceMix Run
-func handleStartDicemix(conn *websocket.Conn, response *commons.DiceMixResponse, state *utils.State) {
+func handleStartDicemix(conn *websocket.Conn, response *messages.DiceMixResponse, state *utils.State) {
 	if response.Err != "" {
 		log.Fatal("Error - ", response.Err)
 	}
@@ -116,8 +116,8 @@ func handleStartDicemix(conn *websocket.Conn, response *commons.DiceMixResponse,
 	// KeyExchange
 	// broadcast our NIKE PublicKey with our peers
 	ecdh := ecdh.NewCurve25519ECDH()
-	keyExchangeRequest, err := proto.Marshal(&commons.KeyExchangeRequest{
-		Code:      commons.C_KEY_EXCHANGE,
+	keyExchangeRequest, err := proto.Marshal(&messages.KeyExchangeRequest{
+		Code:      messages.C_KEY_EXCHANGE,
 		Id:        state.MyID,
 		PublicKey: ecdh.Marshal(state.Kepk),
 		NumMsgs:   state.MyMsgCount,
@@ -125,11 +125,11 @@ func handleStartDicemix(conn *websocket.Conn, response *commons.DiceMixResponse,
 	})
 
 	// broadcast our PublicKey
-	broadcast(conn, keyExchangeRequest, err, commons.C_KEY_EXCHANGE)
+	broadcast(conn, keyExchangeRequest, err, messages.C_KEY_EXCHANGE)
 }
 
 // Response against request for KeyExchange
-func handleKeyExchangeResponse(conn *websocket.Conn, response *commons.DiceMixResponse, state *utils.State) {
+func handleKeyExchangeResponse(conn *websocket.Conn, response *messages.DiceMixResponse, state *utils.State) {
 	if response.Err != "" {
 		log.Fatal("Error - ", response.Err)
 	}
@@ -153,19 +153,19 @@ func handleKeyExchangeResponse(conn *websocket.Conn, response *commons.DiceMixRe
 
 	// DC EXP
 	// broadcast our DC-EXP vector with peers
-	dcExpRequest, err := proto.Marshal(&commons.DCExpRequest{
-		Code:        commons.C_EXP_DC_VECTOR,
+	dcExpRequest, err := proto.Marshal(&messages.DCExpRequest{
+		Code:        messages.C_EXP_DC_VECTOR,
 		Id:          state.MyID,
 		DCExpVector: state.MyDC,
 		Timestamp:   timestamp(),
 	})
 
 	// broadcast our my_dc[]
-	broadcast(conn, dcExpRequest, err, commons.C_EXP_DC_VECTOR)
+	broadcast(conn, dcExpRequest, err, messages.C_EXP_DC_VECTOR)
 }
 
 // obtains roots and runs DC_SIMPLE
-func handleDCExpResponse(conn *websocket.Conn, response *commons.DCExpResponse, state *utils.State) {
+func handleDCExpResponse(conn *websocket.Conn, response *messages.DCExpResponse, state *utils.State) {
 	if response.Err != "" {
 		log.Fatal("Error - ", response.Err)
 	}
@@ -186,8 +186,8 @@ func handleDCExpResponse(conn *websocket.Conn, response *commons.DCExpResponse, 
 
 	// broadcast our DC SIMPLE Vector
 	ecdh := ecdh.NewCurve25519ECDH()
-	dcSimpleRequest, err := proto.Marshal(&commons.DCSimpleRequest{
-		Code:           commons.C_SIMPLE_DC_VECTOR,
+	dcSimpleRequest, err := proto.Marshal(&messages.DCSimpleRequest{
+		Code:           messages.C_SIMPLE_DC_VECTOR,
 		Id:             state.MyID,
 		DCSimpleVector: state.DCSimpleVector,
 		MyOk:           state.MyOk,
@@ -195,12 +195,12 @@ func handleDCExpResponse(conn *websocket.Conn, response *commons.DCExpResponse, 
 		Timestamp:      timestamp(),
 	})
 
-	broadcast(conn, dcSimpleRequest, err, commons.C_SIMPLE_DC_VECTOR)
+	broadcast(conn, dcSimpleRequest, err, messages.C_SIMPLE_DC_VECTOR)
 }
 
 // handles other peers DC-SIMPLE-VECTORS
 // resolves DC-NET
-func handleDCSimpleResponse(conn *websocket.Conn, response *commons.DiceMixResponse, state *utils.State) {
+func handleDCSimpleResponse(conn *websocket.Conn, response *messages.DiceMixResponse, state *utils.State) {
 	if response.Err != "" {
 		log.Fatal("Error - ", response.Err)
 	}
@@ -225,19 +225,19 @@ func handleDCSimpleResponse(conn *websocket.Conn, response *commons.DiceMixRespo
 	}
 
 	// broadcast our Confirmation
-	confirmationRequest, err := proto.Marshal(&commons.ConfirmationRequest{
-		Code:         commons.C_TX_CONFIRMATION,
+	confirmationRequest, err := proto.Marshal(&messages.ConfirmationRequest{
+		Code:         messages.C_TX_CONFIRMATION,
 		Id:           state.MyID,
 		Confirmation: confirmation,
 		Messages:     state.AllMessages,
 		Timestamp:    timestamp(),
 	})
 
-	broadcast(conn, confirmationRequest, err, commons.C_TX_CONFIRMATION)
+	broadcast(conn, confirmationRequest, err, messages.C_TX_CONFIRMATION)
 }
 
 // handles success message for TX
-func handleTXDoneResponse(conn *websocket.Conn, response *commons.TXDoneResponse, state *utils.State) {
+func handleTXDoneResponse(conn *websocket.Conn, response *messages.TXDoneResponse, state *utils.State) {
 	if response.Err != "" {
 		log.Fatal("Error - ", response.Err)
 	}
@@ -249,7 +249,7 @@ func handleTXDoneResponse(conn *websocket.Conn, response *commons.TXDoneResponse
 // handles request from server to initiate kesk
 // broadcasts our kesk for current round
 // initializes - (my_kesk, my_kepk) := (my_next_kesk, my_next_kepk)
-func handleKESKRequest(conn *websocket.Conn, response *commons.InitiaiteKESK, state *utils.State) {
+func handleKESKRequest(conn *websocket.Conn, response *messages.InitiaiteKESK, state *utils.State) {
 	if response.Err != "" {
 		log.Fatal("Error - ", response.Err)
 	}
@@ -258,15 +258,15 @@ func handleKESKRequest(conn *websocket.Conn, response *commons.InitiaiteKESK, st
 
 	// broadcast our kesk
 	ecdh := ecdh.NewCurve25519ECDH()
-	initiaiteKESK, err := proto.Marshal(&commons.InitiaiteKESKResponse{
-		Code:       commons.C_KESK_RESPONSE,
+	initiaiteKESK, err := proto.Marshal(&messages.InitiaiteKESKResponse{
+		Code:       messages.C_KESK_RESPONSE,
 		Id:         state.MyID,
 		PrivateKey: ecdh.MarshalSK(state.Kesk),
 		Timestamp:  timestamp(),
 	})
 
 	// broadcast our kesk
-	broadcast(conn, initiaiteKESK, err, commons.C_KESK_RESPONSE)
+	broadcast(conn, initiaiteKESK, err, messages.C_KESK_RESPONSE)
 
 	// Rotate keys
 	state.Kesk = state.NextKesk
