@@ -19,9 +19,7 @@ func NewNike() NIKE {
 	return &nike{}
 }
 
-// KeyExchange -- generates random NIKE keypair, message
-// broadcasts self public-key
-// receive other peers public-keys[]
+// GenerateKeys -- generates random NIKE keypair
 // mode = 0 to generate (my_kesk, my_kepk)
 // mode = 1 to generate (my_next_kesk, my_next_kepk)
 func (n *nike) GenerateKeys(state *utils.State, mode int) {
