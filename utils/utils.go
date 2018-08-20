@@ -9,8 +9,13 @@ import (
 	base58 "github.com/jbenet/go-base58"
 )
 
-// MaxAllowedMessages - Basic sanity check to avoid weird inputs
-const MaxAllowedMessages = 1000
+const (
+	// MaxAllowedMessages - Basic sanity check to avoid weird inputs
+	MaxAllowedMessages = 1000
+
+	// ResponseWait - Time to wait for response from server.
+	ResponseWait = 30
+)
 
 // Peers - Stores all Peers Info
 type Peers struct {

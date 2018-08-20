@@ -3,6 +3,7 @@ package server
 import (
 	"flag"
 	"net/url"
+	"time"
 
 	"../dc"
 	"../messages"
@@ -56,6 +57,9 @@ func connect() *websocket.Conn {
 	checkError(err)
 
 	log.Info("Connected to ", url.String())
+
+	// Read the message from server with deadline of ResponseWait(30) seconds
+	conn.SetReadDeadline(time.Now().Add(utils.ResponseWait * time.Second))
 
 	return conn
 }
