@@ -9,6 +9,9 @@ import (
 	base58 "github.com/jbenet/go-base58"
 )
 
+// MaxAllowedMessages - Basic sanity check to avoid weird inputs
+const MaxAllowedMessages = 1000
+
 // Peers - Stores all Peers Info
 type Peers struct {
 	ID             int32
@@ -60,5 +63,3 @@ func BytesToBase58String(bytes []byte) string {
 func Base58StringToBytes(str string) []byte {
 	return base58.Decode(str)
 }
-
-func SetupLogging() {}

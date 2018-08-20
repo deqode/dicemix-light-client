@@ -1,8 +1,6 @@
 package dc
 
 import (
-	"os"
-
 	"../field"
 	"../utils"
 	"github.com/shomali11/util/xhashes"
@@ -32,9 +30,8 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 		totalMsgsCount += peer.NumMsgs
 	}
 
-	if totalMsgsCount > 1000 {
-		log.Fatal("Limit Exceeded: More than 1000 messages in tx")
-		os.Exit(1)
+	if totalMsgsCount > utils.MaxAllowedMessages {
+		log.Fatalf("Limit Exceeded: More than %d messages in tx", utils.MaxAllowedMessages)
 	}
 
 	for i := range slots {
