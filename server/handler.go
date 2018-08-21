@@ -71,6 +71,7 @@ func handleJoinResponse(response *messages.RegisterResponse, state *utils.State)
 	}
 	// stores MyId provided by user
 	state.MyID = response.Id
+	state.SessionID = response.SessionId
 
 	log.Info(response.Message)
 	log.Info("My Id - ", state.MyID)
@@ -85,6 +86,7 @@ func handleStartDicemix(conn *websocket.Conn, response *messages.DiceMixResponse
 	log.Info("DiceMix protocol has been initiated")
 
 	// initialize variables
+	state.SessionID = response.SessionId
 	state.Peers = make([]utils.Peers, len(response.Peers)-1)
 	set := make(map[int32]struct{}, len(response.Peers)-1)
 	i := 0
@@ -104,6 +106,7 @@ func handleStartDicemix(conn *websocket.Conn, response *messages.DiceMixResponse
 		}
 	}
 
+	log.Info("Session Id - ", state.SessionID)
 	log.Info("Number of peers - ", len(state.Peers))
 
 	// generates NIKE KeyPair for current run
@@ -118,6 +121,7 @@ func handleStartDicemix(conn *websocket.Conn, response *messages.DiceMixResponse
 	ecdh := ecdh.NewCurve25519ECDH()
 	keyExchangeRequest, err := proto.Marshal(&messages.KeyExchangeRequest{
 		Code:      messages.C_KEY_EXCHANGE,
+		SessionId: state.SessionID,
 		Id:        state.MyID,
 		PublicKey: ecdh.Marshal(state.Kepk),
 		NumMsgs:   state.MyMsgCount,
@@ -155,6 +159,7 @@ func handleKeyExchangeResponse(conn *websocket.Conn, response *messages.DiceMixR
 	// broadcast our DC-EXP vector with peers
 	dcExpRequest, err := proto.Marshal(&messages.DCExpRequest{
 		Code:        messages.C_EXP_DC_VECTOR,
+		SessionId:   state.SessionID,
 		Id:          state.MyID,
 		DCExpVector: state.MyDC,
 		Timestamp:   timestamp(),
@@ -188,6 +193,7 @@ func handleDCExpResponse(conn *websocket.Conn, response *messages.DCExpResponse,
 	ecdh := ecdh.NewCurve25519ECDH()
 	dcSimpleRequest, err := proto.Marshal(&messages.DCSimpleRequest{
 		Code:           messages.C_SIMPLE_DC_VECTOR,
+		SessionId:      state.SessionID,
 		Id:             state.MyID,
 		DCSimpleVector: state.DCSimpleVector,
 		MyOk:           state.MyOk,
@@ -227,6 +233,7 @@ func handleDCSimpleResponse(conn *websocket.Conn, response *messages.DiceMixResp
 	// broadcast our Confirmation
 	confirmationRequest, err := proto.Marshal(&messages.ConfirmationRequest{
 		Code:         messages.C_TX_CONFIRMATION,
+		SessionId:    state.SessionID,
 		Id:           state.MyID,
 		Confirmation: confirmation,
 		Messages:     state.AllMessages,
@@ -260,6 +267,7 @@ func handleKESKRequest(conn *websocket.Conn, response *messages.InitiaiteKESK, s
 	ecdh := ecdh.NewCurve25519ECDH()
 	initiaiteKESK, err := proto.Marshal(&messages.InitiaiteKESKResponse{
 		Code:       messages.C_KESK_RESPONSE,
+		SessionId:  state.SessionID,
 		Id:         state.MyID,
 		PrivateKey: ecdh.MarshalSK(state.Kesk),
 		Timestamp:  timestamp(),

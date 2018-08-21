@@ -33,6 +33,7 @@ type Peers struct {
 // State - stores state info for current run
 type State struct {
 	Run            int
+	SessionID      uint64
 	Peers          []Peers
 	TotalMsgsCount uint32
 	AllMsgHashes   []uint64

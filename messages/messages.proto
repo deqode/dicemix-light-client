@@ -6,6 +6,7 @@ package messages;
 // to parse response into suitable object
 message GenericResponse {
   uint32 Code = 1;
+  uint64 SessionId = 2;
 }
 
 // used by server for obtaining Status Code 
@@ -13,16 +14,18 @@ message GenericResponse {
 // to parse response into suitable object
 message GenericRequest {
   uint32 Code = 1;
+  uint64 SessionId = 2;
 }
 
 // Response returned by server when attempt to join dicemix
 // S_JOIN_RESPONSE
 message RegisterResponse {
   uint32 Code = 1;
-  sint32 Id = 2;
-  string Timestamp = 3;
-  string Message = 4;
-  string Err = 5;
+  uint64 SessionId = 2;
+  sint32 Id = 3;
+  string Timestamp = 4;
+  string Message = 5;
+  string Err = 6;
 }
 
 // Response returned by server for -
@@ -32,7 +35,8 @@ message RegisterResponse {
 // ConfirmationRequest - Code S_TX_CONFIRMATION
 message DiceMixResponse {
   uint32 Code = 1;
-  repeated PeersInfo Peers = 2;
+  uint64 SessionId = 2;
+  repeated PeersInfo Peers = 3;
   string Timestamp = 4;
   string Message = 5;
   string Err = 6;
@@ -58,10 +62,11 @@ message PeersInfo {
 // Code - C_KEY_EXCHANGE
 message KeyExchangeRequest {
   uint32 Code = 1;
-  sint32 Id = 2;
-  bytes PublicKey = 3;
-  uint32 NumMsgs = 4;
-  string Timestamp = 5;
+  uint64 SessionId = 2;
+  sint32 Id = 3;
+  bytes PublicKey = 4;
+  uint32 NumMsgs = 5;
+  string Timestamp = 6;
 }
 
 // For broadcasting our DC Exponential Vector
@@ -69,9 +74,10 @@ message KeyExchangeRequest {
 // Code - C_EXP_DC_VECTOR
 message DCExpRequest {
   uint32 Code = 1;
-  sint32 Id = 2;
-  repeated uint64 DCExpVector = 3;
-  string Timestamp = 4;
+  uint64 SessionId = 2;
+  sint32 Id = 3;
+  repeated uint64 DCExpVector = 4;
+  string Timestamp = 5;
 }
 
 // Response against DCExpRequest
@@ -79,10 +85,11 @@ message DCExpRequest {
 // Code - S_EXP_DC_VECTOR
 message DCExpResponse {
   uint32 Code = 1;
-  repeated uint64 Roots = 2;
-  string Timestamp = 3;
-  string Message = 4;
-  string Err = 5;
+  uint64 SessionId = 2;
+  repeated uint64 Roots = 3;
+  string Timestamp = 4;
+  string Message = 5;
+  string Err = 6;
 }
 
 // For broadcasting our DC Simple Vector
@@ -90,11 +97,12 @@ message DCExpResponse {
 // C_SIMPLE_DC_VECTOR
 message DCSimpleRequest {
   uint32 Code = 1;
-  sint32 Id = 2;
-  repeated bytes DCSimpleVector = 3;
-  bool MyOk = 4;
-  bytes NextPublicKey = 5;
-  string Timestamp = 6;
+  uint64 SessionId = 2;
+  sint32 Id = 3;
+  repeated bytes DCSimpleVector = 4;
+  bool MyOk = 5;
+  bytes NextPublicKey = 6;
+  string Timestamp = 7;
 }
 
 
@@ -102,10 +110,11 @@ message DCSimpleRequest {
 // C_TX_CONFIRMATION
 message ConfirmationRequest {
   uint32 Code = 1;
-  sint32 Id = 2;
-  bytes Confirmation = 3;
-  repeated bytes Messages = 4;
-  string Timestamp = 5;
+  uint64 SessionId = 2;
+  sint32 Id = 3;
+  bytes Confirmation = 4;
+  repeated bytes Messages = 5;
+  string Timestamp = 6;
 }
 
 // Possible response against ConfirmationRequest
@@ -113,26 +122,29 @@ message ConfirmationRequest {
 // Code - S_TX_SUCCESSFUL
 message TXDoneResponse {
   uint32 Code = 1;
-  repeated bytes Messages = 2;
-  string Timestamp = 3;
-  string Message = 4;
-  string Err = 5;
+  uint64 SessionId = 2;
+  repeated bytes Messages = 3;
+  string Timestamp = 4;
+  string Message = 5;
+  string Err = 6;
 }
 
 // message sent by server
 // to initiate KESK
 message InitiaiteKESK {
   uint32 Code = 1;
-  string Timestamp = 2;
-  string Message = 3;
-  string Err = 4;
+  uint64 SessionId = 2;
+  string Timestamp = 3;
+  string Message = 4;
+  string Err = 5;
 }
 
 // For broadcasting our KESK
 // to initiate BLAME
 message InitiaiteKESKResponse {
   uint32 Code = 1;
-  sint32 Id = 2;
-  bytes PrivateKey = 3;
-  string Timestamp = 4;
+  uint64 SessionId = 2;
+  sint32 Id = 3;
+  bytes PrivateKey = 4;
+  string Timestamp = 5;
 }
