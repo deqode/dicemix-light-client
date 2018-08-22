@@ -2,30 +2,100 @@ syntax = "proto3";
 
 package messages;
 
-// for obtaining Status Code from response messages from server
-// to parse response into suitable object
-message GenericResponse {
+// --------------------------- CLIENT TO SERVER PROTO ----------------------------
+
+message RequestHeader {
   uint32 Code = 1;
   uint64 SessionId = 2;
+  sint32 Id = 3;
+  string Timestamp = 4;
 }
 
 // used by server for obtaining Status Code 
 // from request messages sent from client
 // to parse response into suitable object
 message GenericRequest {
+  RequestHeader Header = 1;
+}
+
+message SignedRequest {
+  bytes RequestData = 1;
+  bytes Signature = 2;
+}
+
+// for broadcasting our LTPK
+// to initiate DiceMix Run
+// Code - C_LTPK_REQUEST
+message LtpkExchangeRequest {
+  RequestHeader Header = 1;
+  bytes PublicKey = 2;
+}
+
+// For broadcasting our public key
+// to initiate KeyExchange
+// Code - C_KEY_EXCHANGE
+message KeyExchangeRequest {
+  RequestHeader Header = 1;
+  bytes PublicKey = 2;
+  uint32 NumMsgs = 3;
+}
+
+// For broadcasting our DC Exponential Vector
+// to initiate DC-EXP
+// Code - C_EXP_DC_VECTOR
+message DCExpRequest {
+  RequestHeader Header = 1;
+  repeated uint64 DCExpVector = 2;
+}
+
+// For broadcasting our DC Simple Vector
+// to initiate DC-SIMPLE
+// C_SIMPLE_DC_VECTOR
+message DCSimpleRequest {
+  RequestHeader Header = 1;
+  repeated bytes DCSimpleVector = 2;
+  bool MyOk = 3;
+  bytes NextPublicKey = 4;
+}
+
+// For broadcasting our confirmation for messages
+// C_TX_CONFIRMATION
+message ConfirmationRequest {
+  RequestHeader Header = 1;
+  bytes Confirmation = 2;
+  repeated bytes Messages = 3;
+}
+
+// For broadcasting our KESK
+// to initiate BLAME
+message InitiaiteKESKResponse {
+  RequestHeader Header = 1;
+  bytes PrivateKey = 2;
+}
+
+
+
+// --------------------------- SERVER TO CLIENT PROTO ----------------------------
+
+message ResponseHeader {
   uint32 Code = 1;
   uint64 SessionId = 2;
+  string Timestamp = 3;
+  string Message = 4;
+  string Err = 5;
+}
+
+// for obtaining Status Code from response messages from server
+// to parse response into suitable object
+message GenericResponse {
+  ResponseHeader Header = 1;
 }
 
 // Response returned by server when attempt to join dicemix
 // S_JOIN_RESPONSE
 message RegisterResponse {
-  uint32 Code = 1;
-  uint64 SessionId = 2;
-  sint32 Id = 3;
-  string Timestamp = 4;
-  string Message = 5;
-  string Err = 6;
+  ResponseHeader Header = 1;
+  sint32 Id = 2;
 }
 
 // Response returned by server for -
@@ -34,117 +104,47 @@ message RegisterResponse {
 // DCSimpleResponse - Code S_SIMPLE_DC_VECTOR
 // ConfirmationRequest - Code S_TX_CONFIRMATION
 message DiceMixResponse {
-  uint32 Code = 1;
-  uint64 SessionId = 2;
-  repeated PeersInfo Peers = 3;
-  string Timestamp = 4;
-  string Message = 5;
-  string Err = 6;
-}
-
-// Sub-message for DiceMixResponse
-message PeersInfo {
-  int32 Id = 1;
-  bytes PublicKey = 2;
-  bytes PrivateKey = 3;
-  bytes NextPublicKey = 4;
-  uint32 NumMsgs = 5;
-  repeated uint64 DCVector = 6;
-  repeated bytes DCSimpleVector = 7;
-  bool OK = 8;
-  repeated bytes Messages = 9;
-  bytes Confirmation = 10;
-  bool MessageReceived = 11;
-}
-
-// For broadcasting our public key
-// to initiate KeyExchange
-// Code - C_KEY_EXCHANGE
-message KeyExchangeRequest {
-  uint32 Code = 1;
-  uint64 SessionId = 2;
-  sint32 Id = 3;
-  bytes PublicKey = 4;
-  uint32 NumMsgs = 5;
-  string Timestamp = 6;
-}
-
-// For broadcasting our DC Exponential Vector
-// to initiate DC-EXP
-// Code - C_EXP_DC_VECTOR
-message DCExpRequest {
-  uint32 Code = 1;
-  uint64 SessionId = 2;
-  sint32 Id = 3;
-  repeated uint64 DCExpVector = 4;
-  string Timestamp = 5;
+  ResponseHeader Header = 1;
+  repeated PeersInfo Peers = 2;
 }
 
 // Response against DCExpRequest
 // conatins ROOTS calculated by server using FLINT
 // Code - S_EXP_DC_VECTOR
 message DCExpResponse {
-  uint32 Code = 1;
-  uint64 SessionId = 2;
-  repeated uint64 Roots = 3;
-  string Timestamp = 4;
-  string Message = 5;
-  string Err = 6;
-}
-
-// For broadcasting our DC Simple Vector
-// to initiate DC-SIMPLE
-// C_SIMPLE_DC_VECTOR
-message DCSimpleRequest {
-  uint32 Code = 1;
-  uint64 SessionId = 2;
-  sint32 Id = 3;
-  repeated bytes DCSimpleVector = 4;
-  bool MyOk = 5;
-  bytes NextPublicKey = 6;
-  string Timestamp = 7;
-}
-
-
-// For broadcasting our confirmation for messages
-// C_TX_CONFIRMATION
-message ConfirmationRequest {
-  uint32 Code = 1;
-  uint64 SessionId = 2;
-  sint32 Id = 3;
-  bytes Confirmation = 4;
-  repeated bytes Messages = 5;
-  string Timestamp = 6;
+  ResponseHeader Header = 1;
+  repeated uint64 Roots = 2;
 }
 
 // Possible response against ConfirmationRequest
 // only when all peers send valid confirmations to server
 // Code - S_TX_SUCCESSFUL
 message TXDoneResponse {
-  uint32 Code = 1;
-  uint64 SessionId = 2;
-  repeated bytes Messages = 3;
-  string Timestamp = 4;
-  string Message = 5;
-  string Err = 6;
+  ResponseHeader Header = 1;
+  repeated bytes Messages = 2;
 }
 
 // message sent by server
 // to initiate KESK
 message InitiaiteKESK {
-  uint32 Code = 1;
-  uint64 SessionId = 2;
-  string Timestamp = 3;
-  string Message = 4;
-  string Err = 5;
+  ResponseHeader Header = 1;
 }
 
-// For broadcasting our KESK
-// to initiate BLAME
-message InitiaiteKESKResponse {
-  uint32 Code = 1;
-  uint64 SessionId = 2;
-  sint32 Id = 3;
+
+// --------------------------- EXTRA'S PROTO ----------------------------
+
+// Sub-message for DiceMixResponse
+message PeersInfo {
+  int32 Id = 1;
+  bytes LTPublicKey = 2;
+  bytes PublicKey = 3;
   bytes PrivateKey = 4;
-  string Timestamp = 5;
+  bytes NextPublicKey = 5;
+  uint32 NumMsgs = 6;
+  repeated uint64 DCVector = 7;
+  repeated bytes DCSimpleVector = 8;
+  bool OK = 9;
+  repeated bytes Messages = 10;
+  bytes Confirmation = 11;
+  bool MessageReceived = 12;
 }
