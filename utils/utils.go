@@ -32,6 +32,8 @@ type Peers struct {
 
 // State - stores state info for current run
 type State struct {
+	Ltsk           []byte
+	Ltpk           []byte
 	Run            int
 	SessionID      uint64
 	Peers          []Peers

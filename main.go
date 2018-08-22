@@ -4,9 +4,9 @@ import (
 	"math/rand"
 	"time"
 
+	"./eddsa"
 	"./server"
 	"./utils"
-
 	log "github.com/sirupsen/logrus"
 )
 
@@ -16,10 +16,6 @@ func main() {
 		FullTimestamp: true,
 	}
 	log.SetFormatter(formatter)
-
-	// TODO: generate LTSK, LTPK
-	// Broadcast LTPK before KEPK
-	// sign all messages from LTSK
 
 	// initializes state info
 	var state = initialize()
@@ -39,6 +35,9 @@ func initialize() utils.State {
 	state.MyMsgCount = count()
 	state.MyMessages = make([]string, state.MyMsgCount)
 	state.MyMessagesHash = make([]uint64, state.MyMsgCount)
+
+	edDSA := eddsa.NewCurveED25519()
+	state.Ltpk, state.Ltsk, _ = edDSA.GenerateKeyPair()
 
 	return state
 }

@@ -1,8 +1,6 @@
 package server
 
 import (
-	"time"
-
 	"../ecdh"
 	"../messages"
 	"../utils"
@@ -25,7 +23,7 @@ func handleMessage(conn *websocket.Conn, message []byte, code uint32, state *uti
 		response := &messages.RegisterResponse{}
 		err := proto.Unmarshal(message, response)
 		checkError(err)
-		handleJoinResponse(response, state)
+		handleJoinResponse(conn, response, state)
 	case messages.S_START_DICEMIX:
 		// Response to start DiceMix Run
 		response := &messages.DiceMixResponse{}
@@ -65,28 +63,43 @@ func handleMessage(conn *websocket.Conn, message []byte, code uint32, state *uti
 }
 
 // Response against request to join dicemix transaction
-func handleJoinResponse(response *messages.RegisterResponse, state *utils.State) {
-	if response.Err != "" {
-		log.Fatal("Error- ", response.Err)
+func handleJoinResponse(conn *websocket.Conn, response *messages.RegisterResponse, state *utils.State) {
+	if response.Header.Err != "" {
+		log.Fatal("Error- ", response.Header.Err)
 	}
 	// stores MyId provided by user
 	state.MyID = response.Id
-	state.SessionID = response.SessionId
 
-	log.Info(response.Message)
+	log.Info("MY Ltpk - ", len(state.Ltpk))
+
+	log.Info(response.Header.Message)
 	log.Info("My Id - ", state.MyID)
+
+	header := requestHeader(messages.C_LTPK_REQUEST, state.SessionID, state.MyID)
+	message, _ := proto.Marshal(&messages.LtpkExchangeRequest{
+		Header:    header,
+		PublicKey: state.Ltpk,
+	})
+
+	ltpkExchangeRequest, err := proto.Marshal(&messages.SignedRequest{
+		RequestData: message,
+		Signature:   []byte{},
+	})
+
+	// send our Long Term PublicKey
+	send(conn, ltpkExchangeRequest, err, messages.C_LTPK_REQUEST)
 }
 
 // Response to start DiceMix Run
 func handleStartDicemix(conn *websocket.Conn, response *messages.DiceMixResponse, state *utils.State) {
-	if response.Err != "" {
-		log.Fatal("Error - ", response.Err)
+	if response.Header.Err != "" {
+		log.Fatal("Error - ", response.Header.Err)
 	}
 
 	log.Info("DiceMix protocol has been initiated")
 
 	// initialize variables
-	state.SessionID = response.SessionId
+	state.SessionID = response.Header.SessionId
 	state.Peers = make([]utils.Peers, len(response.Peers)-1)
 	set := make(map[int32]struct{}, len(response.Peers)-1)
 	i := 0
@@ -117,25 +130,26 @@ func handleStartDicemix(conn *websocket.Conn, response *messages.DiceMixResponse
 	log.Info("MY KEPK - ", state.Kepk)
 
 	// KeyExchange
-	// broadcast our NIKE PublicKey with our peers
+	// send our NIKE PublicKey to server
+	header := requestHeader(messages.C_KEY_EXCHANGE, state.SessionID, state.MyID)
+
 	ecdh := ecdh.NewCurve25519ECDH()
-	keyExchangeRequest, err := proto.Marshal(&messages.KeyExchangeRequest{
-		Code:      messages.C_KEY_EXCHANGE,
-		SessionId: state.SessionID,
-		Id:        state.MyID,
+	message, err := proto.Marshal(&messages.KeyExchangeRequest{
+		Header:    header,
 		PublicKey: ecdh.Marshal(state.Kepk),
 		NumMsgs:   state.MyMsgCount,
-		Timestamp: timestamp(),
 	})
 
-	// broadcast our PublicKey
-	broadcast(conn, keyExchangeRequest, err, messages.C_KEY_EXCHANGE)
+	keyExchangeRequest, err := generateSignedRequest(state.Ltsk, message)
+
+	// send our PublicKey
+	send(conn, keyExchangeRequest, err, messages.C_KEY_EXCHANGE)
 }
 
 // Response against request for KeyExchange
 func handleKeyExchangeResponse(conn *websocket.Conn, response *messages.DiceMixResponse, state *utils.State) {
-	if response.Err != "" {
-		log.Fatal("Error - ", response.Err)
+	if response.Header.Err != "" {
+		log.Fatal("Error - ", response.Header.Err)
 	}
 
 	// generate random 160 bit message
@@ -156,23 +170,24 @@ func handleKeyExchangeResponse(conn *websocket.Conn, response *messages.DiceMixR
 	iDcNet.DeriveMyDCVector(state)
 
 	// DC EXP
-	// broadcast our DC-EXP vector with peers
-	dcExpRequest, err := proto.Marshal(&messages.DCExpRequest{
-		Code:        messages.C_EXP_DC_VECTOR,
-		SessionId:   state.SessionID,
-		Id:          state.MyID,
+	// send our DC-EXP vector with peers
+	header := requestHeader(messages.C_EXP_DC_VECTOR, state.SessionID, state.MyID)
+
+	message, err := proto.Marshal(&messages.DCExpRequest{
+		Header:      header,
 		DCExpVector: state.MyDC,
-		Timestamp:   timestamp(),
 	})
 
-	// broadcast our my_dc[]
-	broadcast(conn, dcExpRequest, err, messages.C_EXP_DC_VECTOR)
+	dcExpRequest, err := generateSignedRequest(state.Ltsk, message)
+
+	// send our my_dc[]
+	send(conn, dcExpRequest, err, messages.C_EXP_DC_VECTOR)
 }
 
 // obtains roots and runs DC_SIMPLE
 func handleDCExpResponse(conn *websocket.Conn, response *messages.DCExpResponse, state *utils.State) {
-	if response.Err != "" {
-		log.Fatal("Error - ", response.Err)
+	if response.Header.Err != "" {
+		log.Fatal("Error - ", response.Header.Err)
 	}
 
 	// store roots (message hashes) calculated by server
@@ -189,26 +204,27 @@ func handleDCExpResponse(conn *websocket.Conn, response *messages.DCExpResponse,
 		iNike.GenerateKeys(state, 1)
 	}
 
-	// broadcast our DC SIMPLE Vector
+	// send our DC SIMPLE Vector
+	header := requestHeader(messages.C_SIMPLE_DC_VECTOR, state.SessionID, state.MyID)
+
 	ecdh := ecdh.NewCurve25519ECDH()
-	dcSimpleRequest, err := proto.Marshal(&messages.DCSimpleRequest{
-		Code:           messages.C_SIMPLE_DC_VECTOR,
-		SessionId:      state.SessionID,
-		Id:             state.MyID,
+	message, err := proto.Marshal(&messages.DCSimpleRequest{
+		Header:         header,
 		DCSimpleVector: state.DCSimpleVector,
 		MyOk:           state.MyOk,
 		NextPublicKey:  ecdh.Marshal(state.NextKepk),
-		Timestamp:      timestamp(),
 	})
 
-	broadcast(conn, dcSimpleRequest, err, messages.C_SIMPLE_DC_VECTOR)
+	dcSimpleRequest, err := generateSignedRequest(state.Ltsk, message)
+
+	send(conn, dcSimpleRequest, err, messages.C_SIMPLE_DC_VECTOR)
 }
 
 // handles other peers DC-SIMPLE-VECTORS
 // resolves DC-NET
 func handleDCSimpleResponse(conn *websocket.Conn, response *messages.DiceMixResponse, state *utils.State) {
-	if response.Err != "" {
-		log.Fatal("Error - ", response.Err)
+	if response.Header.Err != "" {
+		log.Fatal("Error - ", response.Header.Err)
 	}
 
 	// copies peers info returned from server to local state.Peers
@@ -230,23 +246,24 @@ func handleDCSimpleResponse(conn *websocket.Conn, response *messages.DiceMixResp
 		confirmation, _ = ecdh.GenerateConfirmation(state.AllMessages, state.Kesk)
 	}
 
-	// broadcast our Confirmation
-	confirmationRequest, err := proto.Marshal(&messages.ConfirmationRequest{
-		Code:         messages.C_TX_CONFIRMATION,
-		SessionId:    state.SessionID,
-		Id:           state.MyID,
+	// send our Confirmation
+	header := requestHeader(messages.C_TX_CONFIRMATION, state.SessionID, state.MyID)
+
+	message, err := proto.Marshal(&messages.ConfirmationRequest{
+		Header:       header,
 		Confirmation: confirmation,
 		Messages:     state.AllMessages,
-		Timestamp:    timestamp(),
 	})
 
-	broadcast(conn, confirmationRequest, err, messages.C_TX_CONFIRMATION)
+	confirmationRequest, err := generateSignedRequest(state.Ltsk, message)
+
+	send(conn, confirmationRequest, err, messages.C_TX_CONFIRMATION)
 }
 
 // handles success message for TX
 func handleTXDoneResponse(conn *websocket.Conn, response *messages.TXDoneResponse, state *utils.State) {
-	if response.Err != "" {
-		log.Fatal("Error - ", response.Err)
+	if response.Header.Err != "" {
+		log.Fatal("Error - ", response.Header.Err)
 	}
 
 	log.Info("Transaction successful. All peers agreed.")
@@ -254,27 +271,28 @@ func handleTXDoneResponse(conn *websocket.Conn, response *messages.TXDoneRespons
 }
 
 // handles request from server to initiate kesk
-// broadcasts our kesk for current round
+// sends our kesk for current round
 // initializes - (my_kesk, my_kepk) := (my_next_kesk, my_next_kepk)
 func handleKESKRequest(conn *websocket.Conn, response *messages.InitiaiteKESK, state *utils.State) {
-	if response.Err != "" {
-		log.Fatal("Error - ", response.Err)
+	if response.Header.Err != "" {
+		log.Fatal("Error - ", response.Header.Err)
 	}
 
-	log.Info("RECV: ", response.Message)
+	log.Info("RECV: ", response.Header.Message)
 
-	// broadcast our kesk
+	// send our kesk
+	header := requestHeader(messages.C_KESK_RESPONSE, state.SessionID, state.MyID)
+
 	ecdh := ecdh.NewCurve25519ECDH()
-	initiaiteKESK, err := proto.Marshal(&messages.InitiaiteKESKResponse{
-		Code:       messages.C_KESK_RESPONSE,
-		SessionId:  state.SessionID,
-		Id:         state.MyID,
+	message, err := proto.Marshal(&messages.InitiaiteKESKResponse{
+		Header:     header,
 		PrivateKey: ecdh.MarshalSK(state.Kesk),
-		Timestamp:  timestamp(),
 	})
 
-	// broadcast our kesk
-	broadcast(conn, initiaiteKESK, err, messages.C_KESK_RESPONSE)
+	initiaiteKESK, err := generateSignedRequest(state.Ltsk, message)
+
+	// send our kesk
+	send(conn, initiaiteKESK, err, messages.C_KESK_RESPONSE)
 
 	// Rotate keys
 	state.Kesk = state.NextKesk
@@ -285,7 +303,7 @@ func handleKESKRequest(conn *websocket.Conn, response *messages.InitiaiteKESK, s
 }
 
 // send request to server
-func broadcast(conn *websocket.Conn, request []byte, err error, code int) {
+func send(conn *websocket.Conn, request []byte, err error, code int) {
 	checkError(err)
 	err = conn.WriteMessage(websocket.BinaryMessage, request)
 	checkError(err)
@@ -293,11 +311,4 @@ func broadcast(conn *websocket.Conn, request []byte, err error, code int) {
 	log.WithFields(log.Fields{
 		"code": code,
 	}).Info("SENT: ")
-}
-
-// to identify time of occurence of an event
-// returns current timestamp
-// example - 2018-08-07 12:04:46.456601867 +0000 UTC m=+0.000753626
-func timestamp() string {
-	return time.Now().String()
 }

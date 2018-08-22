@@ -55,7 +55,6 @@ func connect() *websocket.Conn {
 	log.Info("Connecting to ", url.String())
 	conn, _, err := dialer.Dial(url.String(), nil)
 	checkError(err)
-
 	log.Info("Connected to ", url.String())
 
 	// Read the message from server with deadline of ResponseWait(30) seconds
@@ -78,14 +77,6 @@ func listener(c *websocket.Conn, state *utils.State) {
 
 		// handles response and take further actions
 		// based on response.Code
-		handleMessage(c, message, response.Code, state)
-	}
-}
-
-// checks for any potential errors
-// exists program if one found
-func checkError(err error) {
-	if err != nil {
-		log.Fatalf("Error - %v", err)
+		handleMessage(c, message, response.Header.Code, state)
 	}
 }
