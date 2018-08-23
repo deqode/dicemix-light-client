@@ -13,28 +13,37 @@ import (
 
 // copies peers info returned from server to local state.Peers
 func filterPeers(state *utils.State, peers []*messages.PeersInfo) {
+	// insanity check
+	// if server sends more peers than actually involved in run
+	// +1 represents peer himself, as server broadcast all clients info including his
+	if len(state.Peers)+1 < len(peers) {
+		log.Fatal("Error: obtained more peers from that we started. Expected - ", len(state.Peers), ", Obtained - ", len(peers))
+	}
+
 	var peersInfo []utils.Peers
 	copier.Copy(&peersInfo, &state.Peers)
 	state.Peers = make([]utils.Peers, 0)
 
 	for i := 0; i < len(peers); i++ {
 		for j := 0; j < len(peersInfo); j++ {
-			if peers[i].Id == peersInfo[j].ID {
-				var tempPeer utils.Peers
-
-				tempPeer.ID = peers[i].Id
-				tempPeer.PubKey = peers[i].PublicKey
-				tempPeer.NextPubKey = peers[i].NextPublicKey
-				tempPeer.NumMsgs = peers[i].NumMsgs
-				tempPeer.SharedKey = peersInfo[j].SharedKey
-				tempPeer.Dicemix = peersInfo[j].Dicemix
-				tempPeer.DCSimpleVector = peers[i].DCSimpleVector
-				tempPeer.Ok = peers[i].OK
-				tempPeer.Confirmation = peers[i].Confirmation
-
-				state.Peers = append(state.Peers, tempPeer)
-				break
+			if peers[i].Id != peersInfo[j].ID {
+				continue
 			}
+
+			var tempPeer utils.Peers
+
+			tempPeer.ID = peers[i].Id
+			tempPeer.PubKey = peers[i].PublicKey
+			tempPeer.NextPubKey = peers[i].NextPublicKey
+			tempPeer.NumMsgs = peers[i].NumMsgs
+			tempPeer.SharedKey = peersInfo[j].SharedKey
+			tempPeer.Dicemix = peersInfo[j].Dicemix
+			tempPeer.DCSimpleVector = peers[i].DCSimpleVector
+			tempPeer.Ok = peers[i].OK
+			tempPeer.Confirmation = peers[i].Confirmation
+
+			state.Peers = append(state.Peers, tempPeer)
+			break
 		}
 	}
 }
