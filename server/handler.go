@@ -70,17 +70,20 @@ func handleJoinResponse(conn *websocket.Conn, response *messages.RegisterRespons
 	// stores MyId provided by user
 	state.MyID = response.Id
 
-	log.Info("MY Ltpk - ", len(state.Ltpk))
-
+	log.Info("MY Ltsk - ", state.Ltsk)
+	log.Info("MY Ltpk - ", state.Ltpk)
 	log.Info(response.Header.Message)
 	log.Info("My Id - ", state.MyID)
 
+	// create proto to send response against S_JOIN_RESPONSE
 	header := requestHeader(messages.C_LTPK_REQUEST, state.SessionID, state.MyID)
 	message, _ := proto.Marshal(&messages.LtpkExchangeRequest{
 		Header:    header,
 		PublicKey: state.Ltpk,
 	})
 
+	// cannot sign message via actual ltsk
+	// as uptill now server not have our ltpk
 	ltpkExchangeRequest, err := proto.Marshal(&messages.SignedRequest{
 		RequestData: message,
 		Signature:   []byte{},
@@ -140,6 +143,7 @@ func handleStartDicemix(conn *websocket.Conn, response *messages.DiceMixResponse
 		NumMsgs:   state.MyMsgCount,
 	})
 
+	// generate signed message using our ltsk
 	keyExchangeRequest, err := generateSignedRequest(state.Ltsk, message)
 
 	// send our PublicKey
@@ -157,7 +161,7 @@ func handleKeyExchangeResponse(conn *websocket.Conn, response *messages.DiceMixR
 		state.MyMessages[i] = utils.GenerateMessage()
 	}
 
-	log.Info("My Message - ", utils.Base58StringToBytes(state.MyMessages[0]))
+	log.Info("My Message (1) - ", utils.Base58StringToBytes(state.MyMessages[0]))
 
 	// copies peers info returned from server to local state.Peers
 	// store peers PublicKey and NumMsgs
@@ -172,12 +176,12 @@ func handleKeyExchangeResponse(conn *websocket.Conn, response *messages.DiceMixR
 	// DC EXP
 	// send our DC-EXP vector with peers
 	header := requestHeader(messages.C_EXP_DC_VECTOR, state.SessionID, state.MyID)
-
 	message, err := proto.Marshal(&messages.DCExpRequest{
 		Header:      header,
 		DCExpVector: state.MyDC,
 	})
 
+	// generate signed message using our ltsk
 	dcExpRequest, err := generateSignedRequest(state.Ltsk, message)
 
 	// send our my_dc[]
@@ -215,6 +219,7 @@ func handleDCExpResponse(conn *websocket.Conn, response *messages.DCExpResponse,
 		NextPublicKey:  ecdh.Marshal(state.NextKepk),
 	})
 
+	// generate signed message using our ltsk
 	dcSimpleRequest, err := generateSignedRequest(state.Ltsk, message)
 
 	send(conn, dcSimpleRequest, err, messages.C_SIMPLE_DC_VECTOR)
@@ -248,13 +253,13 @@ func handleDCSimpleResponse(conn *websocket.Conn, response *messages.DiceMixResp
 
 	// send our Confirmation
 	header := requestHeader(messages.C_TX_CONFIRMATION, state.SessionID, state.MyID)
-
 	message, err := proto.Marshal(&messages.ConfirmationRequest{
 		Header:       header,
 		Confirmation: confirmation,
 		Messages:     state.AllMessages,
 	})
 
+	// generate signed message using our ltsk
 	confirmationRequest, err := generateSignedRequest(state.Ltsk, message)
 
 	send(conn, confirmationRequest, err, messages.C_TX_CONFIRMATION)
@@ -266,6 +271,8 @@ func handleTXDoneResponse(conn *websocket.Conn, response *messages.TXDoneRespons
 		log.Fatal("Error - ", response.Header.Err)
 	}
 
+	// transaction is successfull
+	// close the connection
 	log.Info("Transaction successful. All peers agreed.")
 	conn.Close()
 }
@@ -278,6 +285,7 @@ func handleKESKRequest(conn *websocket.Conn, response *messages.InitiaiteKESK, s
 		log.Fatal("Error - ", response.Header.Err)
 	}
 
+	// request to send our KESK to initiate blame stage
 	log.Info("RECV: ", response.Header.Message)
 
 	// send our kesk
@@ -289,6 +297,7 @@ func handleKESKRequest(conn *websocket.Conn, response *messages.InitiaiteKESK, s
 		PrivateKey: ecdh.MarshalSK(state.Kesk),
 	})
 
+	// generate signed message using our ltsk
 	initiaiteKESK, err := generateSignedRequest(state.Ltsk, message)
 
 	// send our kesk
@@ -298,11 +307,13 @@ func handleKESKRequest(conn *websocket.Conn, response *messages.InitiaiteKESK, s
 	state.Kesk = state.NextKesk
 	state.Kepk = state.NextKepk
 
+	// set next round keys to nil
 	state.NextKesk = nil
 	state.NextKepk = nil
 }
 
-// send request to server
+// checks for potential errors
+// sends message to server
 func send(conn *websocket.Conn, request []byte, err error, code int) {
 	checkError(err)
 	err = conn.WriteMessage(websocket.BinaryMessage, request)
