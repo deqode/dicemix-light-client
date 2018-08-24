@@ -1,8 +1,9 @@
 package field
 
 import (
+	"log"
+
 	"github.com/cznic/mathutil"
-	log "github.com/sirupsen/logrus"
 )
 
 // UInt64 - GO basic object notation
@@ -48,7 +49,8 @@ func asLimbs(x UInt64) (uint32, uint32) {
 }
 
 // NewField reduces initial value in the field
-func NewField(value UInt64) Field {
+func NewField(v uint64) Field {
+	value := UInt64(v)
 	return Field{value.reduceOnce().reduceOnceAssert()}
 }
 
@@ -91,4 +93,14 @@ func (src Field) Mul(op2 Field) Field {
 // MulAssign works same as Mul, assigns final value to src
 func (src *Field) MulAssign(op2 Field) {
 	*src = src.Mul(op2)
+}
+
+// Value returns uint64 value from field
+func (src Field) Value() uint64 {
+	return uint64(src.Fp)
+}
+
+// Value returns uint64 value from Uint64
+func (src UInt64) Value() uint64 {
+	return uint64(src)
 }

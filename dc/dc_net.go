@@ -133,11 +133,8 @@ func (d *dcNet) DeriveMyDCVector(state *utils.State) {
 		state.MyMessagesHash[j] = shortHash(state.MyMessages[j])
 		var pow uint64 = 1
 		for i = 0; i < totalMsgsCount; i++ {
-			var op1 = field.NewField(field.UInt64(state.MyDC[i]))
-			pow = power(uint64(state.MyMessagesHash[j]), pow)
-			var op2 = field.NewField(field.UInt64(pow))
-
-			state.MyDC[i] = uint64(op1.Add(op2).Fp)
+			pow = power(state.MyMessagesHash[j], pow)
+			state.MyDC[i] = field.NewField(state.MyDC[i]).Add(field.NewField(pow)).Value()
 		}
 	}
 
@@ -145,12 +142,11 @@ func (d *dcNet) DeriveMyDCVector(state *utils.State) {
 	// my_dc[i] := my_dc[i] (+) (sgn(my_id - p.id) (*) p.dicemix.get_field_element())
 	for j = 0; j < peersCount; j++ {
 		for i = 0; i < totalMsgsCount; i++ {
-			var op1 = field.NewField(field.UInt64(state.MyDC[i]))
-			var op2 = field.NewField(field.UInt64(state.Peers[j].Dicemix.GetFieldElement()))
+			var op2 = field.NewField(state.Peers[j].Dicemix.GetFieldElement())
 			if state.MyID < state.Peers[j].ID {
 				op2 = op2.Neg()
 			}
-			state.MyDC[i] = uint64(op1.Add(op2).Fp)
+			state.MyDC[i] = field.NewField(state.MyDC[i]).Add(op2).Value()
 		}
 	}
 
@@ -194,10 +190,10 @@ func shortHash(message string) uint64 {
 
 // parameter sdhould be within uint64 range
 func power(value, t uint64) uint64 {
-	return uint64(field.NewField(field.UInt64(value)).Mul(field.NewField(field.UInt64(t))).Fp)
+	return field.NewField(value).Mul(field.NewField(t)).Value()
 }
 
 // reduces value into field range
 func reduce(value uint64) uint64 {
-	return uint64(field.NewField(field.UInt64(value)).Fp)
+	return field.NewField(value).Value()
 }
