@@ -11,9 +11,11 @@ import (
 
 const (
 	// MaxAllowedMessages - Basic sanity check to avoid weird inputs
+	// if messages are more than MaxAllowedMessages then close connection
 	MaxAllowedMessages = 1000
 
-	// ResponseWait - Time to wait for response from server.
+	// ResponseWait - Time to wait for response from server
+	// if server does'nt response within ResponseWait seconds then close connection
 	ResponseWait = 30
 )
 
@@ -30,22 +32,27 @@ type Peers struct {
 	Confirmation   []byte
 }
 
+// Session stores information of current Session
+type session struct {
+	Ltsk      []byte
+	Ltpk      []byte
+	SessionID uint64
+	MyID      int32
+	Kesk      crypto.PrivateKey
+	NextKesk  crypto.PrivateKey
+	Kepk      crypto.PublicKey
+	NextKepk  crypto.PublicKey
+}
+
 // State - stores state info for current run
+// TODO: remove ltsk and ltpk from state and
+// store them in more persistent storage
 type State struct {
-	Ltsk           []byte
-	Ltpk           []byte
-	Run            int
-	SessionID      uint64
+	Session        session
 	Peers          []Peers
-	TotalMsgsCount uint32
 	AllMsgHashes   []uint64
-	MyID           int32
 	MyDC           []uint64
 	MyOk           bool
-	Kesk           crypto.PrivateKey
-	NextKesk       crypto.PrivateKey
-	Kepk           crypto.PublicKey
-	NextKepk       crypto.PublicKey
 	MyMessages     []string
 	MyMessagesHash []uint64
 	MyMsgCount     uint32

@@ -27,9 +27,9 @@ func (n *nike) GenerateKeys(state *utils.State, mode int) {
 	ecdh := ecdh.NewCurve25519ECDH()
 	var err error
 	if mode == 0 {
-		(*state).Kesk, (*state).Kepk, err = ecdh.GenerateKeyPair()
+		state.Session.Kesk, state.Session.Kepk, err = ecdh.GenerateKeyPair()
 	} else if mode == 1 {
-		(*state).NextKesk, (*state).NextKepk, err = ecdh.GenerateKeyPair()
+		state.Session.NextKesk, state.Session.NextKepk, err = ecdh.GenerateKeyPair()
 	}
 
 	if err != nil {
@@ -41,19 +41,19 @@ func (n *nike) GenerateKeys(state *utils.State, mode int) {
 // generates RNG based on shared key using ChaCha20
 func (n *nike) DeriveSharedKeys(state *utils.State) {
 	ecdh := ecdh.NewCurve25519ECDH()
-	peersCount := len((*state).Peers)
+	peersCount := len(state.Peers)
 	for i := 0; i < peersCount; i++ {
-		var pubkey, res = ecdh.Unmarshal((*state).Peers[i].PubKey)
+		var pubkey, res = ecdh.Unmarshal(state.Peers[i].PubKey)
 		if !res {
 			log.Fatalf("Error: generating NIKE Shared Keys %v", res)
 		}
 		var err error
-		(*state).Peers[i].SharedKey, err = ecdh.GenerateSharedSecret((*state).Kesk, pubkey)
+		state.Peers[i].SharedKey, err = ecdh.GenerateSharedSecret(state.Session.Kesk, pubkey)
 
 		if err != nil {
 			log.Fatalf("Error: generating NIKE Shared Keys %v", err)
 		}
 
-		(*state).Peers[i].Dicemix = rng.NewRng((*state).Peers[i].SharedKey)
+		state.Peers[i].Dicemix = rng.NewRng(state.Peers[i].SharedKey)
 	}
 }

@@ -143,7 +143,7 @@ func (d *dcNet) DeriveMyDCVector(state *utils.State) {
 	for j = 0; j < peersCount; j++ {
 		for i = 0; i < totalMsgsCount; i++ {
 			var op2 = field.NewField(state.Peers[j].Dicemix.GetFieldElement())
-			if state.MyID < state.Peers[j].ID {
+			if state.Session.MyID < state.Peers[j].ID {
 				op2 = op2.Neg()
 			}
 			state.MyDC[i] = field.NewField(state.MyDC[i]).Add(op2).Value()
