@@ -3,7 +3,6 @@ package dc
 import (
 	"../field"
 	"../utils"
-	"github.com/shomali11/util/xhashes"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -24,16 +23,14 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 	peersCount := uint32(len(state.Peers))
 	state.MyOk = true
 	var i, j uint32
-	totalMsgsCount := state.MyMsgCount
+	totalMsgsCount := messageCount(state.MyMsgCount, state.Peers)
 
-	for _, peer := range state.Peers {
-		totalMsgsCount += peer.NumMsgs
-	}
-
+	// insanity check
 	if totalMsgsCount > utils.MaxAllowedMessages {
 		log.Fatalf("Limit Exceeded: More than %d messages in tx", utils.MaxAllowedMessages)
 	}
 
+	// initialize slots
 	for i := range slots {
 		slots[i] = -1
 	}
@@ -56,6 +53,7 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 		}
 	}
 
+	// if one of my message hashes (root) is missing
 	if !state.MyOk {
 		// Even though the run will be aborted (because we send my_ok = false), transmit the
 		// message in a deterministic slot. This enables the peers to recompute our commitment.
@@ -80,9 +78,9 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 
 	log.Info("Slot's = ", state.DCSimpleVector)
 
+	// encode messages in slots
 	for i = 0; i < peersCount; i++ {
 		for j = 0; j < totalMsgsCount; j++ {
-			// encode messages in slots
 			// xor operation - dc_simple_vector[j] = dc_simple_vector[j] + <randomness for chacha20>
 			xorBytes(state.DCSimpleVector[j], state.DCSimpleVector[j], state.Peers[i].Dicemix.GetBytes(20))
 		}
@@ -93,15 +91,13 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 
 // Resolve the DC-net
 func (d *dcNet) ResolveDCNet(state *utils.State) {
+	// initialize variables
 	var i, j uint32
 	peersCount := uint32(len(state.Peers))
-	totalMsgsCount := state.MyMsgCount
-
-	for _, peer := range state.Peers {
-		totalMsgsCount += peer.NumMsgs
-	}
+	totalMsgsCount := messageCount(state.MyMsgCount, state.Peers)
 	state.AllMessages = state.DCSimpleVector
 
+	// decode messages
 	for i = 0; i < peersCount; i++ {
 		for j = 0; j < totalMsgsCount; j++ {
 			// decodes messages from slots by cancelling out randomness introduced in DC-Simple
@@ -116,15 +112,11 @@ func (d *dcNet) ResolveDCNet(state *utils.State) {
 // Run a DC-net with exponential encoding
 // generates my_dc[]
 func (d *dcNet) DeriveMyDCVector(state *utils.State) {
-	peersCount := uint32(len(state.Peers))
-	totalMsgsCount := state.MyMsgCount
-
-	for _, peer := range state.Peers {
-		totalMsgsCount += peer.NumMsgs
-	}
-
-	state.MyDC = make([]uint64, totalMsgsCount)
+	// initialize variables
 	var i, j uint32
+	peersCount := uint32(len(state.Peers))
+	totalMsgsCount := messageCount(state.MyMsgCount, state.Peers)
+	state.MyDC = make([]uint64, totalMsgsCount)
 
 	// generates power sums of message_hashes
 	// my_dc[i] := my_dc[i] (+) (my_msg_hashes[j] ** (i + 1))
@@ -180,20 +172,4 @@ func (d *dcNet) VerifyProceed(state *utils.State) bool {
 		}
 	}
 	return true
-}
-
-func shortHash(message string) uint64 {
-	// NOTE: after DC-EXP roots would contain hash reduced into field
-	// (as final result would be in field)
-	return xhashes.FNV64(message)
-}
-
-// parameter sdhould be within uint64 range
-func power(value, t uint64) uint64 {
-	return field.NewField(value).Mul(field.NewField(t)).Value()
-}
-
-// reduces value into field range
-func reduce(value uint64) uint64 {
-	return field.NewField(value).Value()
 }
