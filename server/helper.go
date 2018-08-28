@@ -42,7 +42,6 @@ func filterPeers(state *utils.State, peers []*messages.PeersInfo) {
 
 		tempPeer.ID = peer.Id
 		tempPeer.PubKey = peer.PublicKey
-		tempPeer.NextPubKey = peer.NextPublicKey
 		tempPeer.NumMsgs = peer.NumMsgs
 		tempPeer.SharedKey = peerIDs[peer.Id].SharedKey
 		tempPeer.Dicemix = peerIDs[peer.Id].Dicemix

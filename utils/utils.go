@@ -23,7 +23,6 @@ const (
 type Peers struct {
 	ID             int32
 	PubKey         []byte
-	NextPubKey     []byte
 	NumMsgs        uint32
 	SharedKey      []byte
 	Dicemix        rng.DiceMixRng
