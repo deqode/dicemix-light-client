@@ -7,7 +7,6 @@ import (
 	"../messages"
 	"../utils"
 	"github.com/golang/protobuf/proto"
-	"github.com/jinzhu/copier"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -20,31 +19,39 @@ func filterPeers(state *utils.State, peers []*messages.PeersInfo) {
 		log.Fatal("Error: obtained more peers from that we started. Expected - ", len(state.Peers), ", Obtained - ", len(peers))
 	}
 
-	var peersInfo []utils.Peers
-	copier.Copy(&peersInfo, &state.Peers)
+	// stores current peers info
+	var peerIDs = make(map[int32]utils.Peers)
+
+	// map peersInfo to their ids
+	for _, peer := range state.Peers {
+		peerIDs[peer.ID] = peer
+	}
+
+	// clears current available info of peers
 	state.Peers = make([]utils.Peers, 0)
 
-	for i := 0; i < len(peers); i++ {
-		for j := 0; j < len(peersInfo); j++ {
-			if peers[i].Id != peersInfo[j].ID {
-				continue
-			}
-
-			var tempPeer utils.Peers
-
-			tempPeer.ID = peers[i].Id
-			tempPeer.PubKey = peers[i].PublicKey
-			tempPeer.NextPubKey = peers[i].NextPublicKey
-			tempPeer.NumMsgs = peers[i].NumMsgs
-			tempPeer.SharedKey = peersInfo[j].SharedKey
-			tempPeer.Dicemix = peersInfo[j].Dicemix
-			tempPeer.DCSimpleVector = peers[i].DCSimpleVector
-			tempPeer.Ok = peers[i].OK
-			tempPeer.Confirmation = peers[i].Confirmation
-
-			state.Peers = append(state.Peers, tempPeer)
-			break
+	for _, peer := range peers {
+		// insanity check - to exclude clients sent by server which is not one of our peers
+		// works for the case if server malfunctions
+		if _, ok := peerIDs[peer.Id]; !ok {
+			continue
 		}
+
+		// store peers updated info
+		var tempPeer utils.Peers
+
+		tempPeer.ID = peer.Id
+		tempPeer.PubKey = peer.PublicKey
+		tempPeer.NextPubKey = peer.NextPublicKey
+		tempPeer.NumMsgs = peer.NumMsgs
+		tempPeer.SharedKey = peerIDs[peer.Id].SharedKey
+		tempPeer.Dicemix = peerIDs[peer.Id].Dicemix
+		tempPeer.DCSimpleVector = peer.DCSimpleVector
+		tempPeer.Ok = peer.OK
+		tempPeer.Confirmation = peer.Confirmation
+
+		// add peer info to our peers
+		state.Peers = append(state.Peers, tempPeer)
 	}
 }
 
