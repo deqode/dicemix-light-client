@@ -2,10 +2,10 @@ package utils
 
 import (
 	"crypto"
+	"dicemix_client/rng"
 	"math/rand"
 	"time"
 
-	"../rng"
 	base58 "github.com/jbenet/go-base58"
 )
 

@@ -1,8 +1,9 @@
 package dc
 
 import (
-	"../field"
-	"../utils"
+	"dicemix_client/field"
+	"dicemix_client/utils"
+
 	"github.com/shomali11/util/xhashes"
 )
 

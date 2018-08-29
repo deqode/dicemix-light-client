@@ -5,10 +5,11 @@ import (
 	"net/url"
 	"time"
 
-	"../dc"
-	"../messages"
-	"../nike"
-	"../utils"
+	"dicemix_client/dc"
+	"dicemix_client/messages"
+	"dicemix_client/nike"
+	"dicemix_client/utils"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/websocket"
 
@@ -16,7 +17,7 @@ import (
 )
 
 // server configurations
-var addr = flag.String("addr", "localhost:8080", "http service address")
+var addr = flag.String("addr", "localhost:8081", "http service address")
 var dialer = websocket.Dialer{} // use default options
 
 // Exposed interfaces

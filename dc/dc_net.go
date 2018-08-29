@@ -1,8 +1,9 @@
 package dc
 
 import (
-	"../field"
-	"../utils"
+	"dicemix_client/field"
+	"dicemix_client/utils"
+
 	log "github.com/sirupsen/logrus"
 )
 

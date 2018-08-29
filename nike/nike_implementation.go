@@ -3,9 +3,10 @@ package nike
 import (
 	"sync"
 
-	"../ecdh"
-	"../rng"
-	"../utils"
+	"dicemix_client/ecdh"
+	"dicemix_client/rng"
+	"dicemix_client/utils"
+
 	log "github.com/sirupsen/logrus"
 )
 

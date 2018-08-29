@@ -4,9 +4,10 @@ import (
 	"math/rand"
 	"time"
 
-	"./eddsa"
-	"./server"
-	"./utils"
+	"dicemix_client/eddsa"
+	"dicemix_client/server"
+	"dicemix_client/utils"
+
 	log "github.com/sirupsen/logrus"
 )
 

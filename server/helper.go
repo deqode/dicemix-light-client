@@ -3,9 +3,10 @@ package server
 import (
 	"time"
 
-	"../eddsa"
-	"../messages"
-	"../utils"
+	"dicemix_client/eddsa"
+	"dicemix_client/messages"
+	"dicemix_client/utils"
+
 	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"
 )
