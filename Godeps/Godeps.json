@@ -1,0 +1,67 @@
+{
+	"ImportPath": "dicemix_client",
+	"GoVersion": "go1.9",
+	"GodepVersion": "v80",
+	"Deps": [
+		{
+			"ImportPath": "github.com/codahale/chacha20",
+			"Rev": "ec07b4f69a3f70b1dd2a8ad77230deb1ba5d6953"
+		},
+		{
+			"ImportPath": "github.com/cznic/mathutil",
+			"Rev": "ca4c9f2c136954238c3158b92de72078c7672ecc"
+		},
+		{
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Comment": "v1.2.0-2-gb27b920",
+			"Rev": "b27b920f9e71b439b873b17bf99f56467623814a"
+		},
+		{
+			"ImportPath": "github.com/gorilla/websocket",
+			"Comment": "v1.3.0-5-g66b9c49",
+			"Rev": "66b9c49e59c6c48f0ffce28c2d8b8a5678502c6d"
+		},
+		{
+			"ImportPath": "github.com/jbenet/go-base58",
+			"Comment": "1.0.0",
+			"Rev": "6237cf65f3a6f7111cd8a42be3590df99a66bc7d"
+		},
+		{
+			"ImportPath": "github.com/shomali11/util/xhashes",
+			"Rev": "e0f70fd665ff79ac4fb200af18176bebcb5fcae3"
+		},
+		{
+			"ImportPath": "github.com/sirupsen/logrus",
+			"Comment": "v1.0.6-38-g51df1d3",
+			"Rev": "51df1d314861d341546c26e4354ce760fe4bb02b"
+		},
+		{
+			"ImportPath": "github.com/wsddn/go-ecdh",
+			"Rev": "48726bab92085232373de4ec5c51ce7b441c63a0"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/curve25519",
+			"Rev": "614d502a4dac94afa3a6ce146bd1736da82514c6"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/ed25519",
+			"Rev": "614d502a4dac94afa3a6ce146bd1736da82514c6"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/ed25519/internal/edwards25519",
+			"Rev": "614d502a4dac94afa3a6ce146bd1736da82514c6"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/ssh/terminal",
+			"Rev": "614d502a4dac94afa3a6ce146bd1736da82514c6"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "d99a578cf41bfccdeaf48b0845c823a4b8b0ad5e"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/windows",
+			"Rev": "d99a578cf41bfccdeaf48b0845c823a4b8b0ad5e"
+		}
+	]
+}
