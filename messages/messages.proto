@@ -116,6 +116,15 @@ message DCExpResponse {
   repeated uint64 Roots = 2;
 }
 
+// Response against DCSimpleResponse
+// conatins messages resolved via DC-SIMPLE vectors
+// Code - S_SIMPLE_DC_VECTOR
+message DCSimpleResponse {
+  ResponseHeader Header = 1;
+  repeated bytes Messages = 2;
+  repeated PeersInfo Peers = 3;
+}
+
 // Possible response against ConfirmationRequest
 // only when all peers send valid confirmations to server
 // Code - S_TX_SUCCESSFUL

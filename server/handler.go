@@ -44,7 +44,7 @@ func handleMessage(conn *websocket.Conn, message []byte, code uint32, state *uti
 		handleDCExpResponse(conn, response, state)
 	case messages.S_SIMPLE_DC_VECTOR:
 		// conatins peers DC-SIMPLE-VECTOR's
-		response := &messages.DiceMixResponse{}
+		response := &messages.DCSimpleResponse{}
 		err := proto.Unmarshal(message, response)
 		checkError(err)
 		handleDCSimpleResponse(conn, response, state)
@@ -228,7 +228,7 @@ func handleDCExpResponse(conn *websocket.Conn, response *messages.DCExpResponse,
 
 // handles other peers DC-SIMPLE-VECTORS
 // resolves DC-NET
-func handleDCSimpleResponse(conn *websocket.Conn, response *messages.DiceMixResponse, state *utils.State) {
+func handleDCSimpleResponse(conn *websocket.Conn, response *messages.DCSimpleResponse, state *utils.State) {
 	if response.Header.Err != "" {
 		log.Fatal("Error - ", response.Header.Err)
 	}
@@ -239,14 +239,12 @@ func handleDCSimpleResponse(conn *websocket.Conn, response *messages.DiceMixResp
 
 	// finally resolves DC Net Vectors to obtain messages
 	// should contain all honest peers messages in absence of malicious peers
-	iDcNet.ResolveDCNet(state)
+	state.AllMessages = response.Messages
 
 	// Verify that every peer agrees to proceed
-	ok := iDcNet.VerifyProceed(state)
+	confirmation := iDcNet.VerifyProceed(state)
 
-	log.Info("Agree to Proceed? = ", ok)
-
-	var confirmation = ok
+	log.Info("Agree to Proceed? = ", confirmation)
 
 	// send our Confirmation
 	header := requestHeader(messages.C_TX_CONFIRMATION, state.Session.SessionID, state.Session.MyID)

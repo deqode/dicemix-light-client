@@ -8,6 +8,5 @@ import (
 type DC interface {
 	DeriveMyDCVector(*utils.State)
 	RunDCSimple(*utils.State)
-	ResolveDCNet(*utils.State)
 	VerifyProceed(state *utils.State) bool
 }

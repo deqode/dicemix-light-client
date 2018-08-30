@@ -90,26 +90,6 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 	log.Info("My DC-SIMPLE vector = ", state.DCSimpleVector)
 }
 
-// Resolve the DC-net
-func (d *dcNet) ResolveDCNet(state *utils.State) {
-	// initialize variables
-	var i, j uint32
-	peersCount := uint32(len(state.Peers))
-	totalMsgsCount := messageCount(state.MyMsgCount, state.Peers)
-	state.AllMessages = state.DCSimpleVector
-
-	// decode messages
-	for i = 0; i < peersCount; i++ {
-		for j = 0; j < totalMsgsCount; j++ {
-			// decodes messages from slots by cancelling out randomness introduced in DC-Simple
-			// xor operation - all_messages[j] = dc_simple_vector[j] + <randomness for chacha20>
-			xorBytes(state.AllMessages[j], state.AllMessages[j], state.Peers[i].DCSimpleVector[j])
-		}
-	}
-
-	log.Info("Resolved DC-NET vector = ", state.AllMessages)
-}
-
 // Run a DC-net with exponential encoding
 // generates my_dc[]
 func (d *dcNet) DeriveMyDCVector(state *utils.State) {
