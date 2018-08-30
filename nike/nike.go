@@ -1,7 +1,7 @@
 package nike
 
 import (
-	"dicemix_client/utils"
+	"github.com/manjeet-thadani/dicemix-client/utils"
 )
 
 // NIKE - The main interface for Non-interactive Key Exchange (NIKE).

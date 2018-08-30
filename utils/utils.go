@@ -2,9 +2,10 @@ package utils
 
 import (
 	"crypto"
-	"dicemix_client/rng"
 	"math/rand"
 	"time"
+
+	"github.com/manjeet-thadani/dicemix-client/rng"
 
 	base58 "github.com/jbenet/go-base58"
 )

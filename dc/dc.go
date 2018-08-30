@@ -1,7 +1,7 @@
 package dc
 
 import (
-	"dicemix_client/utils"
+	"github.com/manjeet-thadani/dicemix-client/utils"
 )
 
 // DC - The main interface DC_NET.

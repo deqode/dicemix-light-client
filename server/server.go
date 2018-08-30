@@ -1,7 +1,7 @@
 package server
 
 import (
-	"dicemix_client/utils"
+	"github.com/manjeet-thadani/dicemix-client/utils"
 )
 
 // Server - The main interface to enable connection with server.
