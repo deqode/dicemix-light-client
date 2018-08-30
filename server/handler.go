@@ -241,6 +241,8 @@ func handleDCSimpleResponse(conn *websocket.Conn, response *messages.DCSimpleRes
 	// should contain all honest peers messages in absence of malicious peers
 	state.AllMessages = response.Messages
 
+	log.Info("All Messages = ", state.AllMessages)
+
 	// Verify that every peer agrees to proceed
 	confirmation := iDcNet.VerifyProceed(state)
 
