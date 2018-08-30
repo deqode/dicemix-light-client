@@ -50,10 +50,3 @@ func (e *curve25519ECDH) GenerateSharedSecret(privKey crypto.PrivateKey, pubKey 
 	var ecdhCurve = ecdh.NewCurve25519ECDH()
 	return ecdhCurve.GenerateSharedSecret(privKey, pubKey)
 }
-
-// GenerateConfirmation creates confirmation on messages
-// NOTE: this is dummy implementation only for testing purpose
-func (e *curve25519ECDH) GenerateConfirmation(messages [][]byte, privKey crypto.PrivateKey) ([]byte, error) {
-	// TODO: create proper function to generate confirmations on messages
-	return messages[0], nil
-}

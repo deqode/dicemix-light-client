@@ -246,11 +246,7 @@ func handleDCSimpleResponse(conn *websocket.Conn, response *messages.DiceMixResp
 
 	log.Info("Agree to Proceed? = ", ok)
 
-	var confirmation = make([]byte, 0)
-	if ok {
-		ecdh := ecdh.NewCurve25519ECDH()
-		confirmation, _ = ecdh.GenerateConfirmation(state.AllMessages, state.Session.Kesk)
-	}
+	var confirmation = ok
 
 	// send our Confirmation
 	header := requestHeader(messages.C_TX_CONFIRMATION, state.Session.SessionID, state.Session.MyID)

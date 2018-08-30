@@ -29,7 +29,7 @@ type Peers struct {
 	Dicemix        rng.DiceMixRng
 	DCSimpleVector [][]byte
 	Ok             bool
-	Confirmation   []byte
+	Confirmation   bool
 }
 
 // Session stores information of current Session

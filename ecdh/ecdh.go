@@ -11,5 +11,4 @@ type ECDH interface {
 	MarshalSK(crypto.PrivateKey) []byte
 	Unmarshal([]byte) (crypto.PublicKey, bool)
 	GenerateSharedSecret(crypto.PrivateKey, crypto.PublicKey) ([]byte, error)
-	GenerateConfirmation([][]byte, crypto.PrivateKey) ([]byte, error)
 }

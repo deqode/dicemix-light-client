@@ -62,7 +62,7 @@ message DCSimpleRequest {
 // C_TX_CONFIRMATION
 message ConfirmationRequest {
   RequestHeader Header = 1;
-  bytes Confirmation = 2;
+  bool Confirmation = 2;
   repeated bytes Messages = 3;
 }
 
@@ -145,6 +145,6 @@ message PeersInfo {
   repeated bytes DCSimpleVector = 8;
   bool OK = 9;
   repeated bytes Messages = 10;
-  bytes Confirmation = 11;
+  bool Confirmation = 11;
   bool MessageReceived = 12;
 }
