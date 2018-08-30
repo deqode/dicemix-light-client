@@ -3,7 +3,7 @@ package server
 import (
 	"time"
 
-	"github.com/manjeet-thadani/dicemix-client/eddsa"
+	"github.com/manjeet-thadani/dicemix-client/ecdsa"
 	"github.com/manjeet-thadani/dicemix-client/messages"
 	"github.com/manjeet-thadani/dicemix-client/utils"
 
@@ -68,11 +68,11 @@ func requestHeader(code uint32, sessionID uint64, id int32) *messages.RequestHea
 // signs the message with privateKey and returns a Marshalled SignedRequest proto.
 // It will panic if len(privateKey) is not PrivateKeySize.
 func generateSignedRequest(privateKey, message []byte) ([]byte, error) {
-	edDSA := eddsa.NewCurveED25519()
+	ecdsa := ecdsa.NewCurveECDSA()
 
 	return proto.Marshal(&messages.SignedRequest{
 		RequestData: message,
-		Signature:   edDSA.Sign(privateKey, message),
+		Signature:   ecdsa.Sign(privateKey, message),
 	})
 }
 

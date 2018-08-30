@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/manjeet-thadani/dicemix-client/eddsa"
+	"github.com/manjeet-thadani/dicemix-client/ecdsa"
 	"github.com/manjeet-thadani/dicemix-client/server"
 	"github.com/manjeet-thadani/dicemix-client/utils"
 
@@ -39,8 +39,8 @@ func initialize() utils.State {
 	state.MyMessagesHash = make([]uint64, state.MyMsgCount)
 
 	// generate my LTSK, LTPK
-	edDSA := eddsa.NewCurveED25519()
-	state.Session.Ltpk, state.Session.Ltsk, _ = edDSA.GenerateKeyPair()
+	ecdsa := ecdsa.NewCurveECDSA()
+	state.Session.Ltpk, state.Session.Ltsk, _ = ecdsa.GenerateKeyPair()
 
 	return state
 }
