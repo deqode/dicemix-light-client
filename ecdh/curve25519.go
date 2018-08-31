@@ -45,6 +45,16 @@ func (e *curve25519ECDH) MarshalSK(p crypto.PrivateKey) []byte {
 	return pri[:]
 }
 
+// Unmarshal converts byte[] to crypto.PrivateKey
+func (e *curve25519ECDH) UnmarshalSK(privateKey []byte) (crypto.PrivateKey, bool) {
+	var pri [32]byte
+	if len(privateKey) != 32 {
+		return nil, false
+	}
+	copy(pri[:], privateKey)
+	return &pri, true
+}
+
 // GenerateSharedSecret creates shared key using our private key and others public key
 func (e *curve25519ECDH) GenerateSharedSecret(privKey crypto.PrivateKey, pubKey crypto.PublicKey) ([]byte, error) {
 	var ecdhCurve = ecdh.NewCurve25519ECDH()

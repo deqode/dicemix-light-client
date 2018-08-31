@@ -1,6 +1,8 @@
 package ecdsa
 
 import (
+	"fmt"
+
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 )
@@ -34,6 +36,8 @@ func (e *curveS256) GenerateKeyPair() ([]byte, []byte, error) {
 // Sign signs the message with privateKey and returns a signature. It will
 // return nil if error occurs
 func (e *curveS256) Sign(privateKeyBytes, message []byte) []byte {
+
+	fmt.Printf("\n\n%v\n%v\n", privateKeyBytes, message)
 	// obtain private key object from bytes
 	privateKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), privateKeyBytes)
 
@@ -48,6 +52,9 @@ func (e *curveS256) Sign(privateKeyBytes, message []byte) []byte {
 		return nil
 	}
 
+	res := signature.Serialize()
+	fmt.Printf("\n%v\n", res)
+
 	// serialize and return the signature.
-	return signature.Serialize()
+	return res
 }
