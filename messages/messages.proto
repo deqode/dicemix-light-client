@@ -63,7 +63,6 @@ message DCSimpleRequest {
 message ConfirmationRequest {
   RequestHeader Header = 1;
   bool Confirmation = 2;
-  repeated bytes Messages = 3;
 }
 
 // For broadcasting our KESK
@@ -130,7 +129,6 @@ message DCSimpleResponse {
 // Code - S_TX_SUCCESSFUL
 message TXDoneResponse {
   ResponseHeader Header = 1;
-  repeated bytes Messages = 2;
 }
 
 // message sent by server
