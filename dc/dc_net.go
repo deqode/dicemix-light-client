@@ -22,7 +22,6 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 	// initaializing variables
 	slots := make([]int, state.MyMsgCount)
 	peersCount := uint32(len(state.Peers))
-	state.MyOk = true
 	var i, j uint32
 	totalMsgsCount := messageCount(state.MyMsgCount, state.Peers)
 
@@ -31,28 +30,7 @@ func (d *dcNet) RunDCSimple(state *utils.State) {
 		log.Fatalf("Limit Exceeded: More than %d messages in tx", utils.MaxAllowedMessages)
 	}
 
-	// initialize slots
-	for i := range slots {
-		slots[i] = -1
-	}
-
-	// Run an ordinary DC-net with slot reservations
-	for j = 0; j < state.MyMsgCount; j++ {
-		index, count := -1, 0
-		for i = 0; i < totalMsgsCount; i++ {
-			if state.AllMsgHashes[i] == reduce(state.MyMessagesHash[j]) {
-				index, count = int(i), int(count+1)
-			}
-		}
-
-		// if there is exactly one i
-		// with all_msg_hashes[i] = my_msg_hashes[j] then
-		if count == 1 {
-			slots[j] = index
-		} else {
-			state.MyOk = false
-		}
-	}
+	slots, state.MyOk = obtainSlots(state, totalMsgsCount)
 
 	// if one of my message hashes (root) is missing
 	if !state.MyOk {
@@ -129,28 +107,19 @@ func (d *dcNet) DeriveMyDCVector(state *utils.State) {
 
 // Verify that every peer agrees to proceed
 func (d *dcNet) VerifyProceed(state *utils.State) bool {
-	var i uint32
-	totalMsgsCount := state.MyMsgCount
+	totalMsgsCount := messageCount(state.MyMsgCount, state.Peers)
+	slots, ok := obtainSlots(state, totalMsgsCount)
 
-	// if slot collision occured with one of my messages
-	if !state.MyOk {
+	if !ok {
 		return false
 	}
 
-	// if slot collision occured with one of my peers messages
-	for _, peer := range state.Peers {
-		totalMsgsCount += peer.NumMsgs
-		if !peer.Ok {
+	for _, index := range slots {
+		s := shortHash(utils.BytesToBase58String(state.AllMessages[index]))
+		if state.AllMsgHashes[index] != reduce(s) {
 			return false
 		}
 	}
 
-	// if one of my peer provided wrong confirmation
-	for i = 0; i < totalMsgsCount; i++ {
-		s := shortHash(utils.BytesToBase58String(state.AllMessages[i]))
-		if state.AllMsgHashes[i] != reduce(s) {
-			return false
-		}
-	}
 	return true
 }
