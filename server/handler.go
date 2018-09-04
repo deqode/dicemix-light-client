@@ -253,7 +253,6 @@ func handleDCSimpleResponse(conn *websocket.Conn, response *messages.DCSimpleRes
 	message, err := proto.Marshal(&messages.ConfirmationRequest{
 		Header:       header,
 		Confirmation: confirmation,
-		Messages:     state.AllMessages,
 	})
 
 	// generate signed message using our ltsk
