@@ -5,10 +5,10 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/manjeet-thadani/dicemix-client/dc"
-	"github.com/manjeet-thadani/dicemix-client/messages"
-	"github.com/manjeet-thadani/dicemix-client/nike"
-	"github.com/manjeet-thadani/dicemix-client/utils"
+	"dicemix-client/dc"
+	"dicemix-client/messages"
+	"dicemix-client/nike"
+	"dicemix-client/utils"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/websocket"

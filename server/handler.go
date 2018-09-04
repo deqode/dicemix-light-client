@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/manjeet-thadani/dicemix-client/ecdh"
-	"github.com/manjeet-thadani/dicemix-client/messages"
-	"github.com/manjeet-thadani/dicemix-client/utils"
+	"dicemix-client/ecdh"
+	"dicemix-client/messages"
+	"dicemix-client/utils"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/websocket"
