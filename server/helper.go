@@ -3,9 +3,9 @@ package server
 import (
 	"time"
 
-	"dicemix-client/ecdsa"
-	"dicemix-client/messages"
-	"dicemix-client/utils"
+	"github.com/techracers-blockchain/dicemix-light-client/ecdsa"
+	"github.com/techracers-blockchain/dicemix-light-client/messages"
+	"github.com/techracers-blockchain/dicemix-light-client/utils"
 
 	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"

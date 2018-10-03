@@ -1,8 +1,8 @@
 package dc
 
 import (
-	"dicemix-client/field"
-	"dicemix-client/utils"
+	"github.com/techracers-blockchain/dicemix-light-client/field"
+	"github.com/techracers-blockchain/dicemix-light-client/utils"
 
 	log "github.com/sirupsen/logrus"
 )

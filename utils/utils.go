@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	"dicemix-client/rng"
+	"github.com/techracers-blockchain/dicemix-light-client/rng"
 
 	base58 "github.com/jbenet/go-base58"
 )

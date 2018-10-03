@@ -4,9 +4,10 @@ import (
 	"math/rand"
 	"time"
 
-	"dicemix-client/ecdsa"
-	"dicemix-client/server"
-	"dicemix-client/utils"
+	"github.com/techracers-blockchain/dicemix-light-client/ecdsa"
+
+	"github.com/techracers-blockchain/dicemix-light-client/server"
+	"github.com/techracers-blockchain/dicemix-light-client/utils"
 
 	log "github.com/sirupsen/logrus"
 )

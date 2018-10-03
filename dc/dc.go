@@ -1,7 +1,7 @@
 package dc
 
 import (
-	"dicemix-client/utils"
+	"github.com/techracers-blockchain/dicemix-light-client/utils"
 )
 
 // DC - The main interface DC_NET.

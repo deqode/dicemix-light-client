@@ -1,7 +1,7 @@
 package server
 
 import (
-	"dicemix-client/utils"
+	"github.com/techracers-blockchain/dicemix-light-client/utils"
 )
 
 // Server - The main interface to enable connection with server.
